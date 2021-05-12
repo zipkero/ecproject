@@ -1,0 +1,102 @@
+.rt-custom-timebar-key-flex {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  height: $react-timelines-header-row-height + $react-timelines-border-width;
+  line-height: $react-timelines-header-row-height;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px solid $react-timelines-sidebar-separator-color;
+
+  &:last-child {
+    border-bottom-color: $react-timelines-header-separator-color;
+  }
+}
+
+.rt-custom-timebar-child {
+  display: flex;
+  flex-grow: 1;
+  flex-basis: 80px;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+  white-space: nowrap;
+
+  &:not(:last-child) {
+    border-right: 1px solid $react-timelines-header-separator-color;
+  }
+}
+
+.rt-custom-track-key__title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 0.9rem;
+  padding: 0 10px;
+}
+
+.holiday {
+  color: rgba(255, 0, 0, 0.7);
+}
+
+.gantt-app {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1;
+  margin-top: 20px;
+  padding: 10px;
+  overflow-y: hidden;
+}
+
+.gantt-header {
+  display: flex;
+}
+
+.rt-custom {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  font-family: $react-timelines-font-family;
+  color: $react-timelines-text-color;
+  // 추가 내용
+  width: 100%;
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.rt-custom-layout {
+  margin-left: -($react-timelines-sidebar-width -
+        $react-timelines-sidebar-closed-offset);
+  height: 100%;
+  overflow-y: scroll;
+
+  @media (min-width: $react-timelines-auto-open-breakpoint) {
+    margin-left: 0;
+  }
+
+  &.rt-is-open {
+    margin-left: 0;
+  }
+}
+
+.text-align-left {
+  text-align: left;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.tooltip-position-left {
+  left: 0%;
+}
+
+.tooltip-position-right {
+  left: 100%;
+}
+
+.rt-custom-undone-job {
+  // font-size: 1.3rem;
+}
