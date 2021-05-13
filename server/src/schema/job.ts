@@ -2,17 +2,20 @@ import { gql } from "apollo-server-koa";
 
 export const typeDef = gql`
   interface Job {
-    Code: String!
-    RequestDate: Date
-    Category: Int
-    Owner: String
-    Title: String!
-    Status: Int
-    PlanToStart: Date
-    IsStarted: Boolean
-    Writer: String
-    Labels: String
-    Version: Int
+    code: String!
+    name: String
+    requestDate: Date
+    category: Int
+    owner: String
+    title: String!
+    status: Int
+    intergratedStatus: Int
+    planToStart: Date
+    isStarted: Boolean
+    writer: String
+    labels: String
+    version: Int
+    progress: String
   }
 
   interface JobTimeEstimate {
@@ -37,12 +40,28 @@ export const typeDef = gql`
     Type: Int
   }
 
+  input JobSearchOptionType {
+    Code: String
+    Category: Int
+    Owner: String
+    OwnerGroup: String
+    Status: Int
+    Title: String
+    StartFrom: Date
+    DeployFrom: Date
+    Page: Int
+    PageSize: Int
+    IsIncludeEtc: Boolean
+    IsShowOthers: Boolean
+    IsShowAllStatus: Boolean
+  }
+
   input JobData {
     title: String!
   }
 
   type myJobList {
-    myJobAllocated: [Job]
+    myJobAllocated(searchOption: JobSearchOptionType): [Job]
     myTeamJobAllocated: [Job]
     myTeamJobUnAllocated: [Job]
   }
