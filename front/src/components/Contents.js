@@ -76,7 +76,7 @@ export default class Contents extends Component {
       }
     `;
 
-    fetchGraphQLData(null, query)
+    fetchGraphQLData(query)
       .then((result) => {
         const isSucess = result.data.Data.data.manage.erpSync;
         alert(isSucess ? "success!" : "fail. check if you are a master or not");
@@ -95,7 +95,7 @@ export default class Contents extends Component {
         }
       }
     `;
-    fetchGraphQLData(null, query)
+    fetchGraphQLData(query)
       .then((result) => {
         const isSucess = result.data.Data.data.manage.erpAlert;
 

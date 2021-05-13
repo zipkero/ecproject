@@ -44,7 +44,7 @@ export default function* toggleJobStatus(action) {
   try {
     yield put(actions.toggleProgressOverlay(true));
 
-    const data = yield fetchGraphQLData(null, query, variables);
+    const data = yield fetchGraphQLData(query, variables);
 
     yield put(
       actions.noticeSuccessOrFail({

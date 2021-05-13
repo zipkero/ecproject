@@ -33,7 +33,7 @@ export default function* addReason(action) {
 
     yield put(actions.toggleProgressOverlay(true));
 
-    const data = yield fetchGraphQLData(null, query, variables);
+    const data = yield fetchGraphQLData(query, variables);
 
     yield put(
       actions.updatePopupToggle({

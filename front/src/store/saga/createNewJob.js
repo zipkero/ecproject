@@ -153,7 +153,7 @@ export default function* createNewJob(action) {
     if (JOBCODE.value === undefined) {
       variables["inputData"]["isNoBoardNewJob"] = true;
       // ECPROJECT 게시글 생성 API
-      const data = yield fetchGraphQLData(null, query, variables);
+      const data = yield fetchGraphQLData(query, variables);
       const newJobData = data.data.Data.data.createJob;
       const keyControlValues = getKeyControlValuesByFetchedData(newJobData); // 잡코드를 여기서 생성
 
@@ -201,7 +201,7 @@ export default function* createNewJob(action) {
       }
 
       // ECPROJECT 게시글 생성 API
-      const data = yield fetchGraphQLData(null, query, variables);
+      const data = yield fetchGraphQLData(query, variables);
 
       if (isSimpleJob === true) {
         // 생성된 job 의 status ing 로 변경

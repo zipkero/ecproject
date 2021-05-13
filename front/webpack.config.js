@@ -8,6 +8,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const config = {
   name: "ecproject",
   mode: isProduction ? "production" : "development",
+  devtool: "hidden-source-map",
   entry: {
     index: "./src/index.js",
   },
@@ -44,7 +45,10 @@ const config = {
             ],
             "@babel/preset-react",
           ],
-          plugins: ["@babel/plugin-proposal-class-properties"],
+          plugins: [
+            "@babel/plugin-proposal-class-properties",
+            "@babel/plugin-transform-runtime",
+          ],
         },
         exclude: path.join(__dirname, "node_modules"),
       },
@@ -98,7 +102,22 @@ const config = {
       template: path.join(__dirname, "public/index.html"),
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.DefinePlugin({
+      "process.env": {
+        // This has effect on the react lib size
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+      },
+    }),
   ],
+  devServer: {
+    port: 3000,
+    proxy: {
+      "/graphql": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+    },
+  },
 };
 
 module.exports = config;

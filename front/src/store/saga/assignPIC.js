@@ -78,7 +78,7 @@ export default function* assignPIC(action) {
     // variables["inputData"]["boardCd"] = boardData.data.Data.BOARD_CD;
     // variables["inputData"]["boardSeq"] = boardData.data.Data.BOARD_SEQ;
 
-    const data = yield fetchGraphQLData(null, query, variables);
+    const data = yield fetchGraphQLData(query, variables);
 
     yield put(
       actions.updatePopupToggle({

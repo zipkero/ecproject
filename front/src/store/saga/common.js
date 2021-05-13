@@ -101,8 +101,7 @@ export function getKeyControlValuesByFetchedData(fecthedData) {
   return keyControlValues;
 }
 
-export function fetchDefaultCodeList() {
-  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
+export function fetchDefaultCodeList() {  
   const query = `
     query ECProject_Job{
       codeList {
@@ -132,7 +131,7 @@ export function fetchDefaultCodeList() {
     }
   `;
 
-  return fetchGraphQLData(url, query).then((result) => {
+  return fetchGraphQLData(query).then((result) => {
     const defaultCodeList = result.data.Data.data["codeList"];
     const labelList = (defaultCodeList.codeLabelList || []).map((item) => ({
       label: item.name,
@@ -168,7 +167,6 @@ export function fetchDefaultCodeList() {
 }
 
 export function fetchSiteCodeList() {
-  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const query = `
     query ECProject_Job ($inputData: UserGroupSearchOptionType!) {
       codeList {
@@ -197,7 +195,7 @@ export function fetchSiteCodeList() {
     },
   };
 
-  return fetchGraphQLData(url, query, variables).then((result) => {
+  return fetchGraphQLData(query, variables).then((result) => {
     const siteCodeList = result.data.Data.data["codeList"];
     const siteList = (siteCodeList.codeUserGroupList || []).map((item) => ({
       label: item.siteName ?? "",
@@ -215,7 +213,6 @@ export function fetchSiteCodeList() {
 }
 
 export function fetchUserCodeList() {
-  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const query = `
     query ECProject_Job ($inputData: UserSearchOptionType!) {
       codeList {
@@ -237,7 +234,7 @@ export function fetchUserCodeList() {
     },
   };
 
-  return fetchGraphQLData(url, query, variables).then((result) => {
+  return fetchGraphQLData(query, variables).then((result) => {
     const userCodeList = result.data.Data.data["codeList"];
     const userList = (userCodeList.codeUserList || []).map((item) => ({
       label: item.name ?? "",
@@ -321,7 +318,7 @@ export function fetchLoginData(params) {
 
   const query = `${userQuery} ${fragments}`;
 
-  return fetchGraphQLData(null, query).then((result) => {
+  return fetchGraphQLData(query).then((result) => {
     const userData = result.data.Data.data["myUser"];
     return userData;
   });
@@ -385,7 +382,7 @@ export function fetchCurrentlyDoingJob(params) {
 
   const query = `${userQuery} ${fragments}`;
 
-  return fetchGraphQLData(null, query).then((result) => {
+  return fetchGraphQLData(query).then((result) => {
     const userData = result.data.Data.data["myUser"];
     return userData;
   });
@@ -406,13 +403,11 @@ export function fetchECAPIData(url, params) {
   });
 }
 
-export function fetchGraphQLData(url, query, variables) {
-  const defaultUrl = "/ECProject/API/SVC/Project/Common/CommonAPI";
-  const reqSid = window.location.href.match(/ec_req_sid=([^#]+)/)[0];
-  const apiUrl = `${url || defaultUrl}?${reqSid}`;
+export function fetchGraphQLData(query, variables) {
+  const defaultUrl = "/graphql";  
 
   return axios({
-    url: apiUrl,
+    url: defaultUrl,
     method: "post",
     data: {
       operationName: "ECProject_Job",

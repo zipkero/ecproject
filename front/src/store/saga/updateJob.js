@@ -149,7 +149,7 @@ export default function* updateJob(action) {
 
     yield put(actions.toggleProgressOverlay(true));
 
-    const data = yield fetchGraphQLData(null, query, variables);
+    const data = yield fetchGraphQLData(query, variables);
 
     if (toIngRowData) {
       toIngRowData.STATUS.value = 30;

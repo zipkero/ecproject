@@ -45,7 +45,7 @@ export default function* toggleJobStatusList(action) {
           writeDate: WRITEDATE,
         },
       };
-      saveResult.push(yield fetchGraphQLData(null, query, variables));
+      saveResult.push(yield fetchGraphQLData(query, variables));
     }
 
     yield put(

@@ -50,7 +50,7 @@ export default function* openPopup(action) {
   try {
     yield put(actions.toggleProgressOverlay(true));
 
-    const result = yield fetchGraphQLData(null, query, variables);
+    const result = yield fetchGraphQLData(query, variables);
     const data = result.data.Data.data.job;
     const controlValues = getParsedControlValuesByFetchedData(data);
 

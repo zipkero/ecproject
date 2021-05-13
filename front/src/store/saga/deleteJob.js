@@ -44,7 +44,7 @@ export default function* deleteJob(action) {
 
     console.log(variables);
 
-    const data = yield fetchGraphQLData(null, query, variables);
+    const data = yield fetchGraphQLData(query, variables);
 
     yield put(
       actions.noticeSuccessOrFail({

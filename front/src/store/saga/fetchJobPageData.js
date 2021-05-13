@@ -11,8 +11,7 @@ export default function fetchJobPageData(
   additiveData,
   isShowOthers = false,
   isShowAllStatus = false
-) {
-  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
+) {  
   const defaultPageSize =
     requestDataNum && requestDataNum > 1 ? requestDataNum : 30;
   const rowData = {};
@@ -440,35 +439,7 @@ export default function fetchJobPageData(
       : fragments
   }`;
 
-  // fetchPageLimitPage(pageQueryData.countQueryName, variable).then(result => {
-  //   const data = result.data.Data.data;
-  //   const pageData = data[pageQueryData.queryResultSetName];
-  //   const count = pageData[pageQueryData.countQueryName];
-
-  //   return fetchGraphQLData(url, query, variable);
-
-  // }).then(result => {
-  //   const data = result.data.Data.data;
-  //   const pageData = data[pageQueryData.queryResultSetName];
-
-  //   for (const key in pageData) {
-  //     if (key.toString().endsWith("_count")) {
-  //       maxPageNum = (parseInt((pageData[key]) / (pageQueryData.pageSize ?? defaultPageSize)) + 1) || 1;
-  //     } else {
-  //       const gridId = key;
-  //       rowData[gridId] = parseGridRowData(pageData[gridId], gridId);
-  //     }
-  //   }
-
-  //   const parsedPageData = {
-  //     rowData: rowData,
-  //     maxPageNum: maxPageNum,
-  //   };
-
-  //   return parsedPageData;
-  // });;
-
-  return fetchGraphQLData(url, query, variable).then((result) => {
+  return fetchGraphQLData(query, variable).then((result) => {
     const data = result.data.Data.data;
     const pageData = data[pageQueryData.queryResultSetName];
     let maxPageNum;

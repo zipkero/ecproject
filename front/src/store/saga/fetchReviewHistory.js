@@ -1,7 +1,6 @@
 import { fetchGraphQLData } from "./common";
 
 const fetchReviewHistory = async ({ code, category }) => {
-  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const query = `
         query ECProject_Job ($searchOption:JobSearchOptionType) {
             reviewHistory {
@@ -23,7 +22,7 @@ const fetchReviewHistory = async ({ code, category }) => {
     },
   };
 
-  const resp = await fetchGraphQLData(url, query, variable);
+  const resp = await fetchGraphQLData(query, variable);
 
   return resp?.data?.Data?.data?.reviewHistory?.historyList || [];
 };
