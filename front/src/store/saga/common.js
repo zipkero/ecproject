@@ -197,7 +197,7 @@ export function fetchSiteCodeList() {
 
   return fetchGraphQLData(query, variables).then((result) => {
     const siteCodeList = result.data.Data.data["codeList"];
-    const siteList = (siteCodeList.codeUserGroupList || []).map((item) => ({
+    return (siteCodeList.codeUserGroupList || []).map((item) => ({
       label: item.siteName ?? "",
       value: item.site,
       baseBoard: { label: item.baseBoard.name, value: item.baseBoard.value },
@@ -208,7 +208,6 @@ export function fetchSiteCodeList() {
         label: item.baseCategory.name,
       },
     }));
-    return siteList;
   });
 }
 
@@ -236,7 +235,7 @@ export function fetchUserCodeList() {
 
   return fetchGraphQLData(query, variables).then((result) => {
     const userCodeList = result.data.Data.data["codeList"];
-    const userList = (userCodeList.codeUserList || []).map((item) => ({
+    return (userCodeList.codeUserList || []).map((item) => ({
       label: item.name ?? "",
       value: item.id,
       relationControlData: {
@@ -246,7 +245,6 @@ export function fetchUserCodeList() {
         label: item.siteName,
       },
     }));
-    return userList;
   });
 }
 
@@ -319,8 +317,7 @@ export function fetchLoginData(params) {
   const query = `${userQuery} ${fragments}`;
 
   return fetchGraphQLData(query).then((result) => {
-    const userData = result.data.Data.data["myUser"];
-    return userData;
+    return result.data.Data.data["myUser"];
   });
 }
 
@@ -383,8 +380,7 @@ export function fetchCurrentlyDoingJob(params) {
   const query = `${userQuery} ${fragments}`;
 
   return fetchGraphQLData(query).then((result) => {
-    const userData = result.data.Data.data["myUser"];
-    return userData;
+    return result.data.Data.data["myUser"];
   });
 }
 
