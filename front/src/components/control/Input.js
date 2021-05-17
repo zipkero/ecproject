@@ -1,48 +1,51 @@
-import React, { PureComponent } from "react";
+import React from "react";
 
-import { InputGroup, Intent, Text } from "@blueprintjs/core";
+import {InputGroup, Intent, Text} from "@blueprintjs/core";
 import isString from "lodash/isString";
+import {useDispatch} from "react-redux";
+import {actions} from "../../store/actionTypes";
 
-export default class Input extends PureComponent {
-  constructor(props) {
-    super(props);
-  }
+const Input = (props) => {
+  const {
+    labelMode = false,
+    disabled = false,
+    values = [],
+    required,
+    fill = false,
+    pageId,
+    controlId,
+  } = props;
+  const value = values.length > 0 ? values[0].toString() : "";
 
-  handleDataChange(e) {
+  const dispatch = useDispatch();
+  const handleDataChange = (e) => {
     const value = e.target.value;
     if (isString(value)) {
-      this.props.containerActions.updatePageControlData({
-        pageId: this.props.pageId,
-        controlId: this.props.controlId,
-        values: [value],
-      });
+      dispatch(
+          actions.updatePageControlData({
+            pageId: pageId,
+            controlId: controlId,
+            values: [value],
+          })
+      );
     }
+  };
+
+  if (labelMode) {
+    return <Text>{value}</Text>;
   }
-
-  render() {
-    const {
-      labelMode = false,
-      disabled = false,
-      values = [],
-      required,
-      fill = false,
-    } = this.props;
-    const value = values.length > 0 ? values[0].toString() : "";
-
-    if (labelMode) {
-      return <Text>{value}</Text>;
-    }
-    return (
+  return (
       <InputGroup
-        disabled={disabled}
-        selectAllOnFocus={true}
-        //alwaysRenderInput={true}
-        fill={fill}
-        value={value}
-        onChange={this.handleDataChange.bind(this)}
-        placeholder={""}
-        intent={required && !value ? Intent.DANGER : ""}
+          disabled={disabled}
+          selectAllOnFocus={true}
+          //alwaysRenderInput={true}
+          fill={fill}
+          value={value}
+          onChange={handleDataChange}
+          placeholder={""}
+          intent={required && !value ? Intent.DANGER : ""}
       />
-    );
-  }
-}
+  );
+};
+
+export default Input;
