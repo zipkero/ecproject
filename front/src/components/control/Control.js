@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React from "react";
 import Select from "components/control/Select";
 import MultiSelect from "components/control/MultiSelect";
 import RadioBasic from "components/control/RadioBasic";
@@ -22,20 +22,14 @@ const CONTROL_COMPONENT_TYPE = {
   LABEL: Label,
 };
 
-export default class Control extends PureComponent {
-  constructor(props) {
-    super(props);
+const Control = (props) => {
+  const { type } = props;
+  const ControlComponent = CONTROL_COMPONENT_TYPE[type.toUpperCase()];
+  if (!ControlComponent) {
+    return <>null</>;
+  } else {
+    return <ControlComponent {...props} />;
   }
+};
 
-  render() {
-    const controlType = CONTROL_COMPONENT_TYPE[this.props.type.toUpperCase()];
-
-    if (controlType) {
-      const ControlComp = controlType;
-      return <ControlComp {...this.props} />;
-    } else {
-      console.error("Control Type is missing");
-      return <></>;
-    }
-  }
-}
+export default Control;
