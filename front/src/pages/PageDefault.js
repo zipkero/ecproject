@@ -16,7 +16,7 @@ export default class PageDefault extends Component {
     if (props.pageData.usedGrid) {
       props.pageData.gridList = [
         props.pageData.gridListBox.find(
-          (item) => item.gridId == props.pageData.usedGrid
+          (item) => item.gridId === props.pageData.usedGrid
         ),
       ];
     }
@@ -45,7 +45,7 @@ export default class PageDefault extends Component {
         this.props.pageData.usedGrid = REPORTTYPE ?? this.state.usedGrid; // search reset 에 의해 REPORTTYPE 값이 undefined 로 들어올 수 있다.
         this.props.pageData.gridList = [
           this.props.pageData.gridListBox.find(
-            (item) => item.gridId == this.props.pageData.usedGrid
+            (item) => item.gridId === this.props.pageData.usedGrid
           ),
         ];
         this.props.containerActions.triggerFetchJobList();
