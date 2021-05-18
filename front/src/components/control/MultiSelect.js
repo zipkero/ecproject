@@ -1,149 +1,133 @@
-import React, { PureComponent } from "react";
+import React, { useState } from "react";
 
 import { MultiSelect as BPMultiSelect } from "@blueprintjs/select";
 import { Button, MenuItem, Tag } from "@blueprintjs/core";
 import { getContrastColor } from "common";
-import { isNil, isFunction } from "lodash";
+import { isFunction, isNil } from "lodash";
+import { useDispatch } from "react-redux";
+import { actions } from "../../store/actionTypes";
 
-export default class MultiSelect extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      hasFilteredItems: false,
-    };
-  }
+const MultiSelect = (props) => {
+  const [, setHasFilteredItems] = useState(false);
+  const { items = [], values = [], matchValue, itemFilter } = props;
 
-  tagRenderer(item) {
+  const itemFilterFn =
+    !isNil(matchValue) && matchValue !== false && isFunction(itemFilter)
+      ? itemFilter(matchValue)
+      : false;
+  const itemsCustom = itemFilterFn ? items.filter(itemFilterFn) : items;
+  const dispatch = useDispatch();
+
+  const handleDataChange = (newValue) => {
+    dispatch(
+      actions.updatePageControlData({
+        pageId: pageId,
+        controlId: controlId,
+        values: newValue,
+      })
+    );
+    j;
+  };
+
+  const onRemoveAllSelectedItems = () => {
+    handleDataChange([]);
+  };
+
+  const isAlreadySelectedItem = (item) => {
+    return (values ?? []).find((_) => _.value === item.value);
+  };
+
+  const onItemSelect = (item) => {
+    if (isAlreadySelectedItem(item)) {
+      return false;
+    }
+
+    const selectedValues = values ?? [];
+    const newValues = selectedValues.concat([item]);
+
+    handleDataChange(newValues);
+  };
+
+  const onRemoveSelectedItem = (tag) => {
+    const value = tag.key;
+    const newValues = (values ?? []).filter((item) => item.value !== value);
+    handleDataChange(newValues);
+  };
+
+  const itemListPredicate = (query, items) => {
+    const result = (items ?? []).filter((item) => {
+      return (
+        `${item.value.toString().toUpperCase()} ${item.label
+          .toString()
+          .toUpperCase()}`.indexOf(query.toString().toUpperCase()) >= 0
+      );
+    });
+
+    setHasFilteredItems(result.length > 0);
+
+    return result;
+  };
+
+  const clearButton =
+    values.length > 0 ? (
+      <Button icon="cross" minimal={true} onClick={onRemoveAllSelectedItems} />
+    ) : undefined;
+
+  const tagRenderer = (item) => {
     const color = item.color;
     return (
       <Tag
         key={item.value}
         style={
-          color
-            ? {
-                backgroundColor: color,
-                color: getContrastColor(color),
-              }
-            : {}
+          color && {
+            backgroundColor: color,
+            color: getContrastColor(color),
+          }
         }
       >
         {item.label}
       </Tag>
     );
-  }
+  };
 
-  isAlreadySelectedItem(item) {
-    return (this.props.values ?? []).find((_) => _.value === item.value);
-  }
-
-  itemRenderer(item, { handleClick, modifiers }) {
+  const itemRenderer = (item, { handleClick, modifiers }) => {
     return (
       <MenuItem
         // style={{
         //   backgroundColor: item.color,
         // }}
-        icon={this.isAlreadySelectedItem(item) ? "tick" : ""}
+        icon={isAlreadySelectedItem(item) ? "tick" : ""}
         active={modifiers.active}
         key={item.value}
         //label={item.label.toString()}
         onClick={handleClick}
         //text={`${item.label}`}
-        text={this.tagRenderer(item)}
+        text={tagRenderer(item)}
         shouldDismissPopover={false}
       />
     );
-  }
+  };
 
-  handleDataChange(newValue) {
-    this.props.containerActions.updatePageControlData({
-      pageId: this.props.pageId,
-      controlId: this.props.controlId,
-      values: newValue,
-    });
-  }
+  return (
+    <BPMultiSelect
+      items={itemsCustom}
+      resetOnSelect={true}
+      selectedItems={values}
+      itemRenderer={itemRenderer}
+      onItemSelect={onItemSelect}
+      tagRenderer={tagRenderer}
+      tagInputProps={{
+        onRemove: onRemoveSelectedItem,
+        rightElement: clearButton,
+        leftIcon: "search",
+        //tagProps: getTagProps,
+      }}
+      popoverProps={{}}
+      itemListPredicate={itemListPredicate.bind(this)}
+      noResults={"no result"}
+      //openOnKeyDown={true}
+    />
+  );
+};
 
-  // 단일 아이템 삭제
-  onRemoveSelectedItem(tag) {
-    const value = tag.key;
-    const newValues = (this.props.values ?? []).filter(
-      (item) => item.value !== value
-    );
-    this.handleDataChange(newValues);
-  }
-
-  // 전체 아이템 삭제
-  onRemoveAllSelectedItems() {
-    this.handleDataChange([]);
-  }
-
-  // 아이템 선택시
-  onItemSelect(item) {
-    // 중복체크
-    if (this.isAlreadySelectedItem(item)) {
-      return false;
-    }
-
-    const selectedValues = this.props.values ?? [];
-    const newValues = selectedValues.concat([item]);
-
-    this.handleDataChange(newValues);
-  }
-
-  itemListPredicate(query, items) {
-    const result = (items ?? []).filter((item) => {
-      return (
-        `${item.value
-          .toString()
-          .toUpperCase()} ${item.label.toString().toUpperCase()}`.indexOf(
-          query.toString().toUpperCase()
-        ) >= 0
-      );
-    });
-
-    if (result.length > 0) {
-      this.setState({ hasFilteredItems: true });
-    } else {
-      this.setState({ hasFilteredItems: false });
-    }
-
-    return result;
-  }
-
-  render() {
-    const { items = [], values = [], matchValue, itemFilter } = this.props;
-    const clearButton =
-      values.length > 0 ? (
-        <Button
-          icon="cross"
-          minimal={true}
-          onClick={this.onRemoveAllSelectedItems.bind(this)}
-        />
-      ) : undefined;
-    const itemFilterFn =
-      !isNil(matchValue) && matchValue !== false && isFunction(itemFilter)
-        ? itemFilter(matchValue)
-        : false;
-    const itemsCustom = itemFilterFn ? items.filter(itemFilterFn) : items;
-
-    return (
-      <BPMultiSelect
-        items={itemsCustom}
-        resetOnSelect={true}
-        selectedItems={values}
-        itemRenderer={this.itemRenderer.bind(this)}
-        onItemSelect={this.onItemSelect.bind(this)}
-        tagRenderer={this.tagRenderer.bind(this)}
-        tagInputProps={{
-          onRemove: this.onRemoveSelectedItem.bind(this),
-          rightElement: clearButton,
-          leftIcon: "search",
-          //tagProps: getTagProps,
-        }}
-        popoverProps={{}}
-        itemListPredicate={this.itemListPredicate.bind(this)}
-        noResults={"no result"}
-        //openOnKeyDown={true}
-      />
-    );
-  }
-}
+export default MultiSelect;
