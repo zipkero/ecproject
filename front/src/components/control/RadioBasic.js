@@ -1,61 +1,55 @@
-import React, { PureComponent } from "react";
+import React, { useState } from "react";
 
-import { RadioGroup, Radio, Text } from "@blueprintjs/core";
+import { Radio, RadioGroup, Text } from "@blueprintjs/core";
 import isString from "lodash/isString";
+import { useDispatch } from "react-redux";
+import { actions } from "../../store/actionTypes";
 
-export default class RadioBasic extends PureComponent {
-  constructor(props) {
-    super(props);
+const RadioBasic = () => {
+  const [inline, setInline] = useState(true);
+  const dispatch = useDispatch();
+  const {
+    labelMode = false,
+    disabled = false,
+    values = [],
+    items,
+    required,
+    fill = false,
+    pageId,
+    controlId,
+  } = this.props;
 
-    this.state = {
-      inline: true,
-      values: props.selectedValue
-        ? [props.selectedValue]
-        : [props.items[0].value],
-    };
-  }
-
-  handleDataChange(e) {
+  const handleDataChange = (e) => {
     const value = e.target.value;
     if (isString(value)) {
-      this.props.containerActions.updatePageControlData({
-        pageId: this.props.pageId,
-        controlId: this.props.controlId,
-        values: [value],
-      });
+      dispatch(
+        actions.updatePageControlData({
+          pageId: pageId,
+          controlId: controlId,
+          values: [value],
+        })
+      );
     }
-  }
+  };
 
-  render() {
-    const {
-      labelMode = false,
-      disabled = false,
-      values = [],
-      items,
-      required,
-      fill = false,
-    } = this.props;
-    const value =
-      values.length > 0 ? values[0].toString() : this.state.values[0];
-    const makeItems = this.props.items.map((item) => (
-      <Radio label={item.label} value={item.value} />
-    ));
-
-    if (labelMode) {
-      return <Text>{value}</Text>;
-    }
-    return (
-      <RadioGroup
-        inline={this.state.inline}
-        label=""
-        onChange={this.handleDataChange.bind(this)}
-        selectedValue={value}
-      >
-        {makeItems}
-        {/*<Radio label="Soup" value="one" />*/}
-        {/*<Radio label="Salad" value="two" />*/}
-        {/*<Radio label="Sandwich" value="three" />*/}
-      </RadioGroup>
-    );
+  if (labelMode) {
+    return <Text>{value}</Text>;
   }
-}
+  return (
+    <RadioGroup
+      inline={inline}
+      label=""
+      onChange={handleDataChange}
+      selectedValue={value}
+    >
+      {items.map((item) => (
+        <Radio label={item.label} value={item.value} />
+      ))}
+      {/*<Radio label="Soup" value="one" />*/}
+      {/*<Radio label="Salad" value="two" />*/}
+      {/*<Radio label="Sandwich" value="three" />*/}
+    </RadioGroup>
+  );
+};
+
+export default RadioBasic;
