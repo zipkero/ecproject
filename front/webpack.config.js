@@ -16,6 +16,16 @@ const config = {
     filename: "[name].js?[contenthash]",
     path: path.resolve(__dirname, "dist"),
   },
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+      minSize: 500000,
+      maxSize: 500000,
+      automaticNameDelimiter: "-",
+    },
+    minimize: isProduction,
+    minimizer: [],
+  },
   resolve: {
     modules: [path.resolve(__dirname, "src"), "node_modules"],
     extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
