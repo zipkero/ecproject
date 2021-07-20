@@ -1,12 +1,12 @@
 import { JOB_CASES, MONTH_NAMES_IN_KOREAN } from "./constants";
 import {
-  hexToRgb,
   colourIsLight,
-  nextColor,
-  makeStartDate,
-  makeEndDate,
-  getYearMonthDayFromDate,
   getLastDay,
+  getYearMonthDayFromDate,
+  hexToRgb,
+  makeEndDate,
+  makeStartDate,
+  nextColor,
 } from "./utils";
 
 export class BaseDate {
@@ -382,6 +382,7 @@ export class BuildTracks {
     return endTime > baseEndTime;
   }
 }
+
 export class BottomScroll {
   constructor(data) {
     if (data) this.scrollInfo = data;

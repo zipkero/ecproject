@@ -8,7 +8,6 @@ const Label = (props) => {
   if (typeof formatter === "function" && values.length > 0) {
     value = formatter(value);
   }
-
   return <Text ellipsize={true}>{value}</Text>;
 };
 

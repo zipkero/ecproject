@@ -1,6 +1,7 @@
-import { fetchGraphQLData } from "store/saga/common";
+import { fetchGraphQLData } from "store/saga/common.js";
 import { put } from "redux-saga/effects";
 import { actions } from "store/actionTypes";
+import moment from "moment";
 
 export default function* updatePlanList(action) {
   const { controlValues, pageId } = action.payload;
@@ -8,6 +9,7 @@ export default function* updatePlanList(action) {
     JOBCODE,
     CATEGORY,
     PIC,
+    FIN_DATE,
     WRITEDATE,
     ESTIMATEPLANTIME,
     ESTIMATEWORKTIME,
@@ -15,8 +17,8 @@ export default function* updatePlanList(action) {
   } = controlValues;
 
   const query = `
-    mutation ECProject_Job($inputData:JobTimeSpendEstimateInput!, $jobKey:JobDataKey!) {
-      insertJobEstimateTime(inputData: $inputData, jobKey: $jobKey) {
+    mutation ECProject_Job($inputData:JobTimeSpendEstimateInput!, $jobKey:JobDataKey!, $jobData: JobUpdate!) {
+      insertJobEstimateTime(inputData: $inputData, jobKey: $jobKey, jobData: $jobData) {
           estimatePlanTimeInDay
           estimateWorkTimeInDay
           reason
@@ -25,17 +27,36 @@ export default function* updatePlanList(action) {
     }
     `;
 
+  const estimatePlanTimeInDay = ESTIMATEPLANTIME
+    ? parseFloat(ESTIMATEPLANTIME)
+    : 0;
+  const estimateWorkTimeInDay = ESTIMATEWORKTIME
+    ? parseFloat(ESTIMATEWORKTIME)
+    : 0;
+
+  const plusHourValue = (estimatePlanTimeInDay + estimateWorkTimeInDay) * 24;
+
+  let finDate = moment(FIN_DATE);
+  if (plusHourValue > 24) {
+    finDate = finDate.add({ hours: plusHourValue ?? 0 });
+  }
+  finDate = finDate.format("YYYY-MM-DD HH:mm");
+
   const variables = {
     inputData: {
-      estimatePlanTimeInDay: ESTIMATEPLANTIME ? ESTIMATEPLANTIME : 0,
-      estimateWorkTimeInDay: ESTIMATEWORKTIME ? ESTIMATEWORKTIME : 0,
+      estimatePlanTimeInDay: estimatePlanTimeInDay,
+      estimateWorkTimeInDay: estimateWorkTimeInDay,
       reason: REASON,
+      finDate: finDate,
     },
     jobKey: {
       code: JOBCODE.value,
       category: CATEGORY.value,
       owner: PIC?.value,
       writeDate: WRITEDATE,
+    },
+    jobData: {
+      finDate: finDate,
     },
   };
 
@@ -47,7 +68,7 @@ export default function* updatePlanList(action) {
 
     yield put(actions.toggleProgressOverlay(true));
 
-    const data = yield fetchGraphQLData(query, variables);
+    const data = yield fetchGraphQLData(null, query, variables);
 
     yield put(
       actions.updatePopupToggle({

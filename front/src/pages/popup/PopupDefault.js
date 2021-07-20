@@ -1,9 +1,5 @@
 import React, { PureComponent } from "react";
 import Form from "components/form/Form";
-import {
-  getParsedControlValuesByControlList,
-  getDifferentControlValues,
-} from "common";
 
 import { Button } from "@blueprintjs/core";
 

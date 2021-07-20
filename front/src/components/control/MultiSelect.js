@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { MultiSelect as BPMultiSelect } from "@blueprintjs/select";
 import { Button, MenuItem, Tag } from "@blueprintjs/core";
@@ -8,53 +8,76 @@ import { useDispatch } from "react-redux";
 import { actions } from "../../store/actionTypes";
 
 const MultiSelect = (props) => {
-  const [, setHasFilteredItems] = useState(false);
-  const { items = [], values = [], matchValue, itemFilter } = props;
+  const dispatch = useDispatch();
+  const [hasFilteredItems, setHasFilteredItems] = useState(false);
+
+  const {
+    items = [],
+    values = [],
+    matchValue,
+    itemFilter,
+    pageId,
+    controlId,
+  } = props;
 
   const itemFilterFn =
     !isNil(matchValue) && matchValue !== false && isFunction(itemFilter)
       ? itemFilter(matchValue)
       : false;
   const itemsCustom = itemFilterFn ? items.filter(itemFilterFn) : items;
-  const dispatch = useDispatch();
 
-  const handleDataChange = (newValue) => {
-    dispatch(
-      actions.updatePageControlData({
-        pageId: pageId,
-        controlId: controlId,
-        values: newValue,
-      })
-    );
-    j;
-  };
+  const isAlreadySelectedItem = useCallback(
+    (item) => {
+      return (values ?? []).find((_) => _.value === item.value);
+    },
+    [values]
+  );
 
-  const onRemoveAllSelectedItems = () => {
+  const handleDataChange = useCallback(
+    (newValue) => {
+      dispatch(
+        actions.updatePageControlData({
+          pageId: pageId,
+          controlId: controlId,
+          values: newValue,
+        })
+      );
+    },
+    [pageId, controlId, dispatch]
+  );
+
+  // 단일 아이템 삭제
+  const onRemoveSelectedItem = useCallback(
+    (tag) => {
+      const value = tag.key;
+      const newValues = (values ?? []).filter((item) => item.value !== value);
+      handleDataChange(newValues);
+    },
+    [values, handleDataChange]
+  );
+
+  // 전체 아이템 삭제
+  const onRemoveAllSelectedItems = useCallback(() => {
     handleDataChange([]);
-  };
+  }, [handleDataChange]);
 
-  const isAlreadySelectedItem = (item) => {
-    return (values ?? []).find((_) => _.value === item.value);
-  };
+  // 아이템 선택시
+  const onItemSelect = useCallback(
+    (item) => {
+      // 중복체크
+      if (isAlreadySelectedItem(item)) {
+        return false;
+      }
 
-  const onItemSelect = (item) => {
-    if (isAlreadySelectedItem(item)) {
-      return false;
-    }
+      const selectedValues = values ?? [];
+      const newValues = selectedValues.concat([item]);
 
-    const selectedValues = values ?? [];
-    const newValues = selectedValues.concat([item]);
+      handleDataChange(newValues);
+    },
+    [values, isAlreadySelectedItem, handleDataChange]
+  );
 
-    handleDataChange(newValues);
-  };
-
-  const onRemoveSelectedItem = (tag) => {
-    const value = tag.key;
-    const newValues = (values ?? []).filter((item) => item.value !== value);
-    handleDataChange(newValues);
-  };
-
-  const itemListPredicate = (query, items) => {
+  const itemListPredicate = useCallback((query, items) => {
     const result = (items ?? []).filter((item) => {
       return (
         `${item.value.toString().toUpperCase()} ${item.label
@@ -63,32 +86,45 @@ const MultiSelect = (props) => {
       );
     });
 
-    setHasFilteredItems(result.length > 0);
+    if (result.length > 0) {
+      setHasFilteredItems(true);
+    } else {
+      setHasFilteredItems(false);
+    }
 
     return result;
-  };
+  }, []);
 
-  const clearButton =
-    values.length > 0 ? (
-      <Button icon="cross" minimal={true} onClick={onRemoveAllSelectedItems} />
-    ) : undefined;
-
-  const tagRenderer = (item) => {
+  const tagRenderer = useCallback((item) => {
     const color = item.color;
     return (
       <Tag
         key={item.value}
         style={
-          color && {
-            backgroundColor: color,
-            color: getContrastColor(color),
-          }
+          color
+            ? {
+                backgroundColor: color,
+                color: getContrastColor(color),
+              }
+            : {}
         }
       >
         {item.label}
       </Tag>
     );
-  };
+  }, []);
+
+  const clearButton = useMemo(
+    () => () =>
+      values.length > 0 ? (
+        <Button
+          icon="cross"
+          minimal={true}
+          onClick={onRemoveAllSelectedItems}
+        />
+      ) : undefined,
+    [onRemoveAllSelectedItems, values]
+  );
 
   const itemRenderer = (item, { handleClick, modifiers }) => {
     return (
@@ -123,7 +159,7 @@ const MultiSelect = (props) => {
         //tagProps: getTagProps,
       }}
       popoverProps={{}}
-      itemListPredicate={itemListPredicate.bind(this)}
+      itemListPredicate={itemListPredicate}
       noResults={"no result"}
       //openOnKeyDown={true}
     />

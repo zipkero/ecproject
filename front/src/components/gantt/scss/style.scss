@@ -1,10 +1,7 @@
 // Common
 $react-timelines-spacing: 5px;
 $react-timelines-keyline-color: #eee !default;
-$react-timelines-separator-dark-color: darken(
-  $react-timelines-keyline-color,
-  10%
-) !default;
+$react-timelines-separator-dark-color: darken($react-timelines-keyline-color, 10%) !default;
 
 $react-timelines-auto-open-breakpoint: 1000px !default;
 $react-timelines-font-family: sans-serif !default;
@@ -55,19 +52,19 @@ $react-timelines-button-size: 44px !default;
   }
 }
 
-@import "utils";
+@import 'utils';
 
-@import "components/controls";
-@import "components/element";
-@import "components/grid";
-@import "components/layout";
-@import "components/marker";
-@import "components/sidebar";
-@import "components/timebar";
-@import "components/timebar-key";
-@import "components/timeline";
-@import "components/track";
-@import "components/tracks";
-@import "components/track-key";
-@import "components/track-keys";
-@import "components/custom";
+@import 'components/controls';
+@import 'components/element';
+@import 'components/grid';
+@import 'components/layout';
+@import 'components/marker';
+@import 'components/sidebar';
+@import 'components/timebar';
+@import 'components/timebar-key';
+@import 'components/timeline';
+@import 'components/track';
+@import 'components/tracks';
+@import 'components/track-key';
+@import 'components/track-keys';
+@import 'components/custom';

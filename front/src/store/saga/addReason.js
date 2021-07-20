@@ -1,4 +1,4 @@
-import { fetchGraphQLData } from "store/saga/common";
+import { fetchGraphQLData } from "store/saga/common.js";
 import { put } from "redux-saga/effects";
 import { actions } from "store/actionTypes";
 
@@ -33,7 +33,7 @@ export default function* addReason(action) {
 
     yield put(actions.toggleProgressOverlay(true));
 
-    const data = yield fetchGraphQLData(query, variables);
+    const data = yield fetchGraphQLData(null, query, variables);
 
     yield put(
       actions.updatePopupToggle({

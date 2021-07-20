@@ -1,7 +1,5 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
-
-import Tracks from ".";
 import Element from "./Element";
 
 // data structure: [ [], [], [] ] 각 배열이 하나의 row 배열 요소들은 elements

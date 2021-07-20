@@ -1,4 +1,4 @@
-import { fetchGraphQLData, jobFragments } from "store/saga/common";
+import { fetchGraphQLData, jobFragments } from "store/saga/common.js";
 import { actions } from "store/actionTypes";
 import { put } from "redux-saga/effects";
 import { getParsedControlValuesByFetchedData } from "common";
@@ -20,6 +20,7 @@ export default function* openPopup(action) {
         name
         ...basicField
         ...timeData
+        finDate
         timeSpendHistoryList {
             start
             end
@@ -32,6 +33,7 @@ export default function* openPopup(action) {
           estimatePlanTimeInDay
           estimateWorkTimeInDay
           reason
+          finDate
         }
       }
     }
@@ -50,7 +52,7 @@ export default function* openPopup(action) {
   try {
     yield put(actions.toggleProgressOverlay(true));
 
-    const result = yield fetchGraphQLData(query, variables);
+    const result = yield fetchGraphQLData(null, query, variables);
     const data = result.data.Data.data.job;
     const controlValues = getParsedControlValuesByFetchedData(data);
 

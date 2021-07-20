@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 
 const fieldRender = {
   JOBCODE: (props) => <span className={"span-link"}>{props.codeValue}</span>,
@@ -18,10 +18,10 @@ const SelectRenderer = (props) => {
   const codeLabel = value?.label ?? "";
   const codeValue = value?.value ?? "";
 
-  return useMemo(() => fieldRender[field]({ codeValue, codeLabel, rowData }), [
-    value,
-    rowData.CATEGORY,
-  ]);
+  return useMemo(
+    () => fieldRender[field]({ codeValue, codeLabel, rowData }),
+    [value, rowData.CATEGORY]
+  );
 };
 
 export default SelectRenderer;

@@ -13,28 +13,26 @@
   opacity: 1;
 }
 
+
 .rt-marker--now {
   color: $react-timelines-marker-now-background-color;
   border-color: rgba(
-    $react-timelines-marker-now-background-color,
-    $react-timelines-marker-line-transparency
+                  $react-timelines-marker-now-background-color,
+                  $react-timelines-marker-line-transparency
   );
 }
 
 .rt-marker--pointer {
   color: $react-timelines-marker-pointer-background-color;
   border-color: rgba(
-    $react-timelines-marker-pointer-background-color,
-    $react-timelines-marker-line-transparency
+                  $react-timelines-marker-pointer-background-color,
+                  $react-timelines-marker-line-transparency
   );
 }
 
 .rt-marker--pointer.rt-is-highlighted {
   color: darken($react-timelines-marker-pointer-background-color, 25%);
-  border-color: rgba(
-    darken($react-timelines-marker-pointer-background-color, 1),
-    25%
-  );
+  border-color: rgba(darken($react-timelines-marker-pointer-background-color, 1), 25%);
 }
 
 .rt-marker__label {
@@ -63,7 +61,7 @@
     border-left: $size solid transparent;
     border-right: $size solid transparent;
     border-top: $size solid currentColor;
-    content: " ";
+    content: ' ';
   }
 }
 

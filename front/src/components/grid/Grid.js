@@ -1,24 +1,24 @@
 import React, { PureComponent } from "react";
 import {
-  LinkRenderer,
-  DateRenderer,
-  SelectRenderer,
-  MultiSelectRenderer,
-  LoadingCellRenderer,
   ButtonRenderer,
+  DateRenderer,
+  LinkRenderer,
+  LoadingCellRenderer,
+  MultiSelectRenderer,
+  SelectRenderer,
   TitleRenderer,
 } from "components/grid/renderer";
-import { SelectEditor, DateEditor } from "components/grid/editor";
+import { DateEditor, SelectEditor } from "components/grid/editor";
 import { SelectComparator, TimeComparator } from "components/grid/comparator";
-import { isEqual, isNil, isPlainObject, isArray, isBoolean } from "lodash";
+import { isArray, isBoolean, isEqual, isNil, isPlainObject } from "lodash";
 import {
-  ContextMenu,
-  Menu,
-  MenuItem,
   Alert,
-  Intent,
   Button,
   Checkbox,
+  ContextMenu,
+  Intent,
+  Menu,
+  MenuItem,
 } from "@blueprintjs/core";
 import IconExcel from "components/control/IconExcel";
 import { AgGridReact } from "ag-grid-react";
@@ -33,6 +33,7 @@ import GridStepper from "components/grid/GridStepper";
 import XLSX from "xlsx";
 import "./grid.scss";
 import ProgressRenderer from "./renderer/ProgressRenderer";
+import StatusRenderer from "./renderer/StatusRenderer";
 
 export default class Grid extends PureComponent {
   constructor(props) {
@@ -47,6 +48,7 @@ export default class Grid extends PureComponent {
       spinner: false, // excel icon spinner state
       isShowOthers: false,
       isShowAllStatus: false,
+      isProgressedInTestFilterApply: false,
       submitParams: [
         {
           name: "BOARD_CD",
@@ -79,16 +81,12 @@ export default class Grid extends PureComponent {
   getDefaultQATeam(site, siteName) {
     let regex = /^VN|^EFS|^EUX/; // 팀명이 VN, EFS, EUX 으로 시작하면 EQA로 설정
     let result = {};
-    if (siteName == "EFE") {
-      // EFE 인 경우 ERP3
-      result.value = "연구개발1팀";
-      result.label = "ERP3팀";
-    } else if (regex.test(siteName)) {
+    if (regex.test(siteName)) {
       result.value = "테스트팀";
       result.label = "EQA팀";
     } else {
-      result.value = site;
-      result.label = siteName;
+      result.value = "EQC팀";
+      result.label = "EQC팀";
     }
     return result;
   }
@@ -139,8 +137,11 @@ export default class Grid extends PureComponent {
     progress: {
       cellRenderer: "ProgressRenderer",
     },
-  };
 
+    status: {
+      cellRenderer: "StatusRenderer",
+    },
+  };
   // column 전체 기본옵션 지정 (columnDefs, column type 지정 안했을 경우 받는 가장 우선순위 낮은 전체 공통옵션)
   defaultColDef = {
     resizable: true,
@@ -171,6 +172,7 @@ export default class Grid extends PureComponent {
         }
 
         if (isNil(label)) {
+          console.log("label is nil: " + data);
           return "";
         }
 
@@ -241,6 +243,7 @@ export default class Grid extends PureComponent {
     ButtonRenderer: ButtonRenderer,
     TitleRenderer: TitleRenderer,
     ProgressRenderer: ProgressRenderer,
+    StatusRenderer: StatusRenderer,
 
     SelectEditor: SelectEditor,
     DateEditor: DateEditor,
@@ -407,6 +410,8 @@ export default class Grid extends PureComponent {
     const gridData = { gridList: [{ ...this.props }] }; // 그리드 정보
     const controlValues = this.props.searchControlList
       ? getParsedControlValuesByControlList(this.props.searchControlList)
+      : this.props.parentControlList
+      ? getParsedControlValuesByControlList(this.props.parentControlList)
       : {};
     const { rowData, maxPageNum } = await fetchJobPageData(
       pageId,
@@ -417,7 +422,10 @@ export default class Grid extends PureComponent {
       {
         ...usedGrid,
         ...gridData,
-      }
+      },
+      this.props.options?.isShowOthers,
+      this.props.options?.isShowAllStatus,
+      this.props.options?.isProgressedInTestFilterApply
     );
     let rows = rowData?.[gridId] ?? [];
 
@@ -599,7 +607,10 @@ export default class Grid extends PureComponent {
       return false;
     }
 
-    if (param.colDef.field == "FIN" && isETCCategory !== true) {
+    if (
+      ["FIN", "FIN_DATE"].includes(param.colDef.field) &&
+      isETCCategory !== true
+    ) {
       if (data.START) {
         this.openPopup("PopupUpdatePlanList", data);
         param.event.preventDefault();
@@ -611,9 +622,8 @@ export default class Grid extends PureComponent {
     if (param.colDef.field == "JOBCODE") {
       this.openPopup("PopupDetail", data);
     }
-
     if (param.colDef.field == "SWITCH") {
-      if (data.SWITCH === 30) {
+      if (data.SWITCH === 30 || data.PRIVATE_STATUS.value === 30) {
         // ing 에서 hold 로 변경
         if (isETCCategory) {
           // ETC category인 경우 바로 완료처리
@@ -740,7 +750,8 @@ export default class Grid extends PureComponent {
         text="Request Mid Review"
         onClick={() => {
           const { TEAM } = this.defaultSupport ?? [];
-          const manager = findManager(TEAM.value);          
+          const manager = findManager(TEAM.value);
+
           this.openPopup(
             "PopupCreateNewJob",
             data,
@@ -764,7 +775,7 @@ export default class Grid extends PureComponent {
         onClick={() => {
           const { TEAM } = this.defaultSupport ?? [];
           const manager = findManager(TEAM.value);
-          
+
           this.openPopup(
             "PopupCreateNewJob",
             data,
@@ -808,6 +819,13 @@ export default class Grid extends PureComponent {
         icon="add-to-artifact"
         text="Create Support"
         onClick={() => {
+          if (data.STATUS.value === 90) {
+            if (data.CATEGORY.value !== 501) {
+              alert("Can't change the status of deployed job");
+              return false;
+            }
+          }
+
           const { CATEGORY, TEAM } = this.defaultSupport ?? [];
           this.openPopup(
             "PopupCreateNewJob",
@@ -1098,7 +1116,7 @@ export default class Grid extends PureComponent {
     });
   }
 
-  showOthers({ target }) {
+  changeShowOthers({ target }) {
     this.props.containerActions.triggerToggleShowOptions({
       pageId: this.props.pageId,
       options: {
@@ -1108,11 +1126,21 @@ export default class Grid extends PureComponent {
     this.props.containerActions.triggerFetchJobList();
   }
 
-  showAllStatus({ target }) {
+  changeShowAllStatus({ target }) {
     this.props.containerActions.triggerToggleShowOptions({
       pageId: this.props.pageId,
       options: {
         isShowAllStatus: target.checked,
+      },
+    });
+    this.props.containerActions.triggerFetchJobList();
+  }
+
+  changeProgressedInTestFilterApply({ target }) {
+    this.props.containerActions.triggerToggleShowOptions({
+      pageId: this.props.pageId,
+      options: {
+        isProgressedInTestFilterApply: target.checked,
       },
     });
     this.props.containerActions.triggerFetchJobList();
@@ -1156,7 +1184,7 @@ export default class Grid extends PureComponent {
       />
     ) : null;
 
-    const showTypeButton = ["myTeamJobAllocated", "myJobAllocated"].includes(
+    const showTypeCheckBox = ["myTeamJobAllocated", "myJobAllocated"].includes(
       this.props.gridId
     ) && (
       <>
@@ -1165,7 +1193,7 @@ export default class Grid extends PureComponent {
           large={false}
           small={true}
           label="Show Others"
-          onChange={this.showOthers.bind(this)}
+          onChange={this.changeShowOthers.bind(this)}
           value={this.state.isShowOthers}
         />
         <Checkbox
@@ -1173,7 +1201,7 @@ export default class Grid extends PureComponent {
           large={false}
           small={true}
           label="Show All Status"
-          onChange={this.showAllStatus.bind(this)}
+          onChange={this.changeShowAllStatus.bind(this)}
           value={this.state.isShowAllStatus}
         />
       </>
@@ -1188,6 +1216,21 @@ export default class Grid extends PureComponent {
         {this.props.headerButton.name}
       </Button>
     ) : null;
+
+    const showProgressedInTestCheckBox = ["byCategoryTest"].includes(
+      this.props.gridId
+    ) && (
+      <>
+        <Checkbox
+          className="mb-0 ml-15"
+          large={false}
+          small={true}
+          label="Show Testing Over Than 2 Days"
+          onChange={this.changeProgressedInTestFilterApply.bind(this)}
+          value={this.state.isProgressedInTestFilterApply}
+        />
+      </>
+    );
 
     return (
       <>
@@ -1206,9 +1249,10 @@ export default class Grid extends PureComponent {
           >
             {title || ""}
           </Button>
-          {showTypeButton}
+          {showTypeCheckBox}
           {multiJobCodeCheckbox}
           {finAllButton}
+          {showProgressedInTestCheckBox}
           <IconExcel
             spinner={this.state.spinner}
             onClick={this.handleClickExcelIcon.bind(this)}

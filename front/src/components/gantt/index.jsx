@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-
-import Controls from "./components/Controls";
 import Layout from "./components/Layout";
 import createTime from "./utils/time";
 

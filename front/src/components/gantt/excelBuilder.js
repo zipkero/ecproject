@@ -11,6 +11,7 @@ import {
   makeColumnKeyFromDate,
   nextColor,
 } from "./utils";
+
 export default function makeGanttExcel(baseDate, timebar, tracks) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Gantt");
@@ -274,12 +275,8 @@ class ExcelUtils {
   }
 
   setMerge(position) {
-    const {
-      startColumnKey,
-      endColumnKey,
-      startRowIndex,
-      endRowIndex,
-    } = position;
+    const { startColumnKey, endColumnKey, startRowIndex, endRowIndex } =
+      position;
     if (startColumnKey === endColumnKey && startRowIndex === endRowIndex)
       return;
 
@@ -298,8 +295,7 @@ class ExcelUtils {
     if (fill)
       this.worksheet.getRow(startRowIndex).getCell(startColumnKey).fill = fill;
     if (alignment)
-      this.worksheet
-        .getRow(startRowIndex)
-        .getCell(startColumnKey).alignment = alignment;
+      this.worksheet.getRow(startRowIndex).getCell(startColumnKey).alignment =
+        alignment;
   }
 }

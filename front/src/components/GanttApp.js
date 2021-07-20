@@ -5,7 +5,7 @@ import GanttExcel from "./gantt/components/Excel";
 import GridStepper from "components/grid/GridStepper";
 import "lib/css/style.css";
 
-import { BuildTimebar, BuildTracks, BaseDate } from "components/gantt/builders";
+import { BaseDate, BuildTimebar, BuildTracks } from "components/gantt/builders";
 
 const now = new Date();
 
@@ -13,13 +13,8 @@ const MIN_ZOOM = 2;
 const MAX_ZOOM = 20;
 
 function GanttApp(props) {
-  const {
-    controlList,
-    tracks,
-    holiday,
-    stepperOptions,
-    containerActions,
-  } = props;
+  const { controlList, tracks, holiday, stepperOptions, containerActions } =
+    props;
 
   const startFrom = controlList.find(
     (control) => control.controlId === "START_FROM"
@@ -59,8 +54,8 @@ function GanttApp(props) {
         JOBCODE,
         CATEGORY,
         PIC,
-        WRITEDATE,
-      },
+        WRITEDATE
+      }
     });
   };
 
@@ -91,7 +86,7 @@ function GanttApp(props) {
           end: baseEndDate,
           zoom,
           zoomMin: MIN_ZOOM,
-          zoomMax: MAX_ZOOM,
+          zoomMax: MAX_ZOOM
         }}
         isOpen={open}
         toggleOpen={handleToggleOpen}

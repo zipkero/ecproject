@@ -1,4 +1,4 @@
-import { fetchECAPIData, fetchGraphQLData } from "store/saga/common";
+import { fetchGraphQLData } from "store/saga/common.js";
 import { actions } from "store/actionTypes";
 import { put } from "redux-saga/effects";
 
@@ -78,7 +78,7 @@ export default function* assignPIC(action) {
     // variables["inputData"]["boardCd"] = boardData.data.Data.BOARD_CD;
     // variables["inputData"]["boardSeq"] = boardData.data.Data.BOARD_SEQ;
 
-    const data = yield fetchGraphQLData(query, variables);
+    const data = yield fetchGraphQLData(null, query, variables);
 
     yield put(
       actions.updatePopupToggle({

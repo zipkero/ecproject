@@ -26,6 +26,7 @@ export const types = {
   TOGGLE_PROGRESS_OVERLAY: "TOGGLE_PROGRESS_OVERLAY",
   NOTICE_SUCCESS_OR_FAIL: "NOTICE_SUCCESS_OR_FAIL",
 
+  UPDATE_ALARM_DATA: "UPDATE_ALARM_DATA",
   UPDATE_LOGIN_DATA: "UPDATE_LOGIN_DATA",
   UPDATE_PAGE_GRID_DATA: "UPDATE_PAGE_GRID_DATA",
   UPDATE_PAGE_GANTT_DATA: "UPDATE_PAGE_GANTT_DATA",
@@ -76,6 +77,7 @@ export const actions = {
   updatePopupToggle: createAction(types.UPDATE_POPUP_TOGGLE),
   updatePageControlData: createAction(types.UPDATE_PAGE_CONTROL_DATA),
   resetPageState: createAction(types.RESET_PAGE_STATE),
+  updateAlarmData: createAction(types.UPDATE_ALARM_DATA),
 
   test: createAction(types.TEST),
 };

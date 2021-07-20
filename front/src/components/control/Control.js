@@ -23,13 +23,13 @@ const CONTROL_COMPONENT_TYPE = {
 };
 
 const Control = (props) => {
-  const { type } = props;
-  const ControlComponent = CONTROL_COMPONENT_TYPE[type.toUpperCase()];
-  if (!ControlComponent) {
-    return <>null</>;
-  } else {
-    return <ControlComponent {...props} />;
+  const controlType = CONTROL_COMPONENT_TYPE[props.type.toUpperCase()];
+  if (!controlType) {
+    console.error("Control Type is missing");
+    return <></>;
   }
+  const ControlComp = controlType;
+  return <ControlComp {...props} small={true} />;
 };
 
 export default Control;

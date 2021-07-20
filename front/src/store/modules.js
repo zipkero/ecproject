@@ -1,10 +1,12 @@
 import { handleActions } from "redux-actions";
-import produce from "immer";
-import { getCurrentDateWithFirstDay, getCurrentDatehWithLastDay } from "common";
+import produce, { enableES5 } from "immer";
+import { getCurrentDatehWithLastDay, getCurrentDateWithFirstDay } from "common";
 import { types } from "store/actionTypes";
-import { isArray, isNil, isEmpty, cloneDeep } from "lodash";
-import { options } from "constant/options";
-import { vSlice } from "lib/utils";
+import { cloneDeep, isArray, isEmpty, isNil } from "lodash";
+import { options } from "../constant/options";
+import { vMove, vSlice } from "../lib/utils";
+
+enableES5();
 
 const initialControlItems = {};
 
@@ -18,12 +20,6 @@ const columnBasic = [
   {
     field: "BOARDSEQ",
     headerName: "boardSeq",
-    type: "text",
-    hide: true,
-  },
-  {
-    field: "BOARDNUM",
-    headerName: "BOARDNUM",
     type: "text",
     hide: true,
   },
@@ -75,6 +71,15 @@ const columnDatas = [
     },
   },
   {
+    field: "BOARDNUM",
+    headerName: "Dev.No",
+    type: "text",
+    hide: false,
+    width: 100,
+    sortable: true,
+    filter: true,
+  },
+  {
     field: "JOBCODE",
     headerName: "Job Code",
     editable: false,
@@ -89,6 +94,7 @@ const columnDatas = [
     headerName: "Title (open with board link of center)",
     type: "title",
     width: 300,
+    filter: true,
   },
   {
     field: "CATEGORY",
@@ -102,7 +108,7 @@ const columnDatas = [
   {
     field: "STATUS",
     headerName: "Status",
-    type: "select",
+    type: "status",
     width: 80,
     cellEditorParams: {
       items: [],
@@ -121,13 +127,24 @@ const columnDatas = [
     type: "date",
     width: 95,
   },
-  {
+  /*{
     field: "FIN",
     headerName: "Fin",
     type: "date",
     width: 95,
     valueGetter: function (params) {
       return params.data.STATUS?.value == 50 ? null : params.data.FIN; // status가 '50 hold' 일 때 Fin 날짜를 표시하지 않는다
+    },
+  },*/
+  {
+    field: "FIN_DATE",
+    headerName: "FinDate",
+    type: "date",
+    width: 105,
+    valueGetter: function (params) {
+      return [0, 10, 50, 1000].includes(params.data.STATUS?.value)
+        ? null
+        : params.data.FIN_DATE; // status가 '50 hold' 일 때 Fin 날짜를 표시하지 않는다
     },
   },
   {
@@ -174,6 +191,8 @@ const columnDatas = [
     headerName: "Reason for dev",
     type: "text",
     editable: true,
+    sortable: false,
+    filter: false,
     width: 100,
   },
   {
@@ -181,80 +200,15 @@ const columnDatas = [
     headerName: "Common or not",
     type: "text",
     editable: true,
+    sortable: false,
+    filter: false,
     width: 100,
   },
 ];
 
 const columnFields = [...columnBasic, ...columnAlign, ...columnDatas];
 
-const rows = [
-  // {
-  //     PRIORITY: 1,
-  //     CATEGORY: { value: 101, label: "develop" },
-  //     TEAM: { value: "EFA", label: "EFA" },
-  //     PLANNER: { value: "임태형", label: "임태형" },
-  //     PIC: { value: "소병용", label: "소병용" },
-  //     JOBCODE: { value: "A19_01457", label: "전표 여러 개 인쇄시에도 조건별양식 적용" },
-  //     TITLE: "전표 여러 개 인쇄시에도 조건별양식 적용",
-  //     STATUS: { value: "ING", label: "ING" },
-  //     PLANSTART: "2020-05-12",
-  //     PLANFIN: "2020-05-20",
-  //     START: "2020-05-15",
-  //     FIN: "2020-06-01",
-  //     //ERRORCOUNT: 10
-  // },
-  // {
-  //     TEAM: "EFA",
-  //     PLANNER: "김다솔",
-  //     PIC: "소병용",
-  //     JOBCODE: "A18_00348",
-  //     TITLE: "버튼 DB화",
-  //     STATUS: "To Dev",
-  // },
-  // {
-  //     TEAM: "ECS",
-  //     PLANNER: "나대엽",
-  //     PIC: "고흥모",
-  //     JOBCODE: "A19_04066",
-  //     TITLE: "불러오기 통합",
-  //     STATUS: "TEST",
-  //     WORKSTARTDATE: "2020-01-01",
-  //     WORKFINISHDATE: "2020-05-17",
-  //     WORKDEPLOYDATE: "2020-06-02",
-  //     ERRORCOUNT: 20
-  // },
-  // {
-  //     TEAM: "EQA",
-  //     PLANNER: "나대엽",
-  //     PIC: "황상덕",
-  //     JOBCODE: "A19_04066",
-  //     TITLE: "불러오기 통합 #TEST",
-  //     STATUS: "TEST",
-  //     WORKSTARTDATE: "2020-05-19",
-  //     WORKFINISHDATE: "2020-06-01",
-  //     WORKDEPLOYDATE: "2020-06-02",
-  // },
-  // {
-  //     TEAM: "EFA",
-  //     PLANNER: "나대엽",
-  //     PIC: "소병용",
-  //     JOBCODE: "A19_04066",
-  //     TITLE: "불러오기 통합 #양식지원",
-  //     STATUS: "DONE",
-  //     WORKSTARTDATE: "2020-02-01",
-  //     WORKFINISHDATE: "2020-05-01",
-  // },
-  // {
-  //     TEAM: "ERP1",
-  //     PLANNER: "나대엽",
-  //     PIC: "임명식",
-  //     JOBCODE: "A19_04066",
-  //     TITLE: "불러오기 통합 #서버작업",
-  //     STATUS: "DONE",
-  //     WORKSTARTDATE: "2020-03-01",
-  //     WORKFINISHDATE: "2020-05-06",
-  // },
-];
+const rows = [];
 
 const controlOptions = {
   WRITEDATE: {
@@ -286,9 +240,17 @@ const controlOptions = {
     title: "Fin",
     type: "DateInput",
     labelMode: true,
-    format: "YYYY-MM-DD HH:mm",
+    format: "YYYY-MM-DD",
     plusDate: "",
     plusText: "",
+  },
+
+  FIN_DATE: {
+    controlId: "FIN_DATE",
+    title: "Fin Date",
+    type: "DateInput",
+    format: "YYYY-MM-DD",
+    labelMode: false,
   },
 
   JOBCODE: {
@@ -308,6 +270,7 @@ const controlOptions = {
     title: "Job Title",
     type: "Input",
     required: true,
+    filter: true,
     hide: true,
   },
 
@@ -497,6 +460,13 @@ const controlOptions = {
     selectedValue: "",
     items: [],
   },
+  TREE: {
+    controlId: "TREE",
+    title: "Tree",
+    type: "Tree",
+    selectedValue: "",
+    items: [],
+  },
 };
 
 const {
@@ -504,6 +474,7 @@ const {
   WRITER,
   START,
   FIN,
+  FIN_DATE,
   JOBCODE,
   JOBTITLE,
   CATEGORY,
@@ -530,6 +501,7 @@ const {
   REASONFORDEV,
   COMMONORNOT,
   REPORTTYPE,
+  TREE,
 } = controlOptions;
 
 /* initialState */
@@ -571,6 +543,8 @@ const initialState = {
               headerName: "Progress",
               type: "progress",
               editable: false,
+              sortable: false,
+              filter: false,
               width: 120,
             }
           ),
@@ -678,12 +652,12 @@ const initialState = {
                 type: "date",
                 width: 95,
               },
-              {
+              /*{
                 field: "FIN",
                 headerName: "Fin",
                 type: "date",
                 width: 95,
-              },
+              },*/
               {
                 field: "DEPLOY",
                 headerName: "Deploy",
@@ -708,12 +682,16 @@ const initialState = {
                 headerName: "UTime",
                 type: "time",
                 width: 70,
+                editable: false,
+                filter: false,
               },
               {
                 field: "PROGRESS",
                 headerName: "Progress",
                 type: "progress",
                 editable: false,
+                sortable: false,
+                filter: false,
                 width: 120,
               },
               {
@@ -831,12 +809,12 @@ const initialState = {
                 type: "date",
                 width: 95,
               },
-              {
+              /*{
                 field: "FIN",
                 headerName: "Fin",
                 type: "date",
                 width: 95,
-              },
+              },*/
               {
                 field: "DEPLOY",
                 headerName: "Deploy",
@@ -960,6 +938,26 @@ const initialState = {
         PIC,
         STATUS,
         {
+          controlId: "START_FROM",
+          title: "Start From",
+          type: "DateInput",
+        },
+        {
+          controlId: "START_TO",
+          title: "Start To",
+          type: "DateInput",
+        },
+        {
+          controlId: "FIN_FROM",
+          title: "Fin From",
+          type: "DateInput",
+        },
+        {
+          controlId: "FIN_TO",
+          title: "Fin To",
+          type: "DateInput",
+        },
+        {
           controlId: "DEPLOY_FROM",
           title: "Deploy From",
           type: "DateInput",
@@ -969,6 +967,7 @@ const initialState = {
           title: "Deploy To",
           type: "DateInput",
         },
+        BOARDNUM
       ],
       gridList: [
         {
@@ -1004,6 +1003,8 @@ const initialState = {
               headerName: "Progress",
               type: "progress",
               editable: false,
+              sortable: false,
+              filter: false,
               width: 120,
             }
           ),
@@ -1028,6 +1029,7 @@ const initialState = {
               headerName: "Progress",
               type: "progress",
               editable: false,
+              filter: false,
               width: 120,
             }
           ),
@@ -1290,11 +1292,22 @@ const initialState = {
               type: "date",
               width: 95,
             },
-            {
+            /*{
               field: "FIN",
               headerName: "Fin",
               type: "date",
               width: 95,
+            },*/
+            {
+              field: "FIN_DATE",
+              headerName: "FinDate",
+              type: "date",
+              width: 105,
+              valueGetter: function (params) {
+                return [0, 10, 50, 1000].includes(params.data.STATUS?.value)
+                  ? null
+                  : params.data.FIN_DATE; // status가 '50 hold' 일 때 Fin 날짜를 표시하지 않는다
+              },
             },
             {
               field: "DEPLOY",
@@ -1327,6 +1340,15 @@ const initialState = {
               type: "text",
               editable: true,
               width: 100,
+            },
+            {
+              field: "BOARDNUM",
+              headerName: "Dev.No",
+              type: "text",
+              hide: false,
+              width: 100,
+              sortable: true,
+              filter: false,
             },
             {
               field: "LABEL",
@@ -1509,12 +1531,12 @@ const initialState = {
               type: "text",
               width: 130,
             },
-            {
+            /*{
               field: "FIN",
               headerName: "Fin",
               type: "text",
               width: 130,
-            },
+            },*/
             {
               field: "COST",
               headerName: "Cost",
@@ -1598,12 +1620,12 @@ const initialState = {
               type: "text",
               width: 130,
             },
-            {
+            /*{
               field: "FIN",
               headerName: "Fin",
               type: "text",
               width: 130,
-            },
+            },*/
             {
               field: "REALTIME",
               headerName: "Real Time",
@@ -1681,12 +1703,12 @@ const initialState = {
               type: "text",
               width: 130,
             },
-            {
+            /*{
               field: "FIN",
               headerName: "Fin",
               type: "text",
               width: 130,
-            },
+            },*/
             {
               field: "WORKEDDATE",
               headerName: "Worked Date",
@@ -1989,9 +2011,10 @@ const initialState = {
           labelMode: true,
         },
         START,
-        FIN,
+        FIN_DATE,
         ESTIMATEPLANTIME,
         ESTIMATEWORKTIME,
+        FIN,
         REASON,
       ],
     },
@@ -2137,6 +2160,16 @@ const initialState = {
       width: "700px",
       formState: 1,
       controlList: [NOTICE],
+    },
+
+    PopupAlarmManage: {
+      parentPageId: "",
+      pageId: "PopupAlarmManage",
+      isPopup: true,
+      isOpen: false,
+      width: "700px",
+      formState: 1,
+      controlList: [TREE],
     },
   },
 };
@@ -2371,7 +2404,8 @@ const createReducer = (fetchedInitData) => {
                 Object.assign(target, controlData);
               }
             }
-          } else {            
+          } else {
+            // 전부 page 영역으로 옮긴 후 제거
             if (page.controlValues) {
               page.controlValues[controlData.controlId] = controlData.values;
             } else {

@@ -6,7 +6,6 @@ import React from "react";
 // import LastPageIcon from "@material-ui/icons/LastPage";
 // import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
 // import NavigateNextIcon from "@material-ui/icons/NavigateNext";
-
 import { Button, InputGroup } from "@blueprintjs/core";
 
 export default function GridStepper(props) {

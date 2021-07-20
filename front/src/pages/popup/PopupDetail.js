@@ -2,11 +2,12 @@ import React, { PureComponent } from "react";
 import Form from "components/form/Form";
 import { Button, Tag } from "@blueprintjs/core";
 import {
-  getParsedControlValuesByControlList,
   getDifferentControlValues,
+  getParsedControlValuesByControlList,
 } from "common";
-import { isArray, includes } from "lodash";
+import { includes, isArray } from "lodash";
 import { getControlOption } from "../../constant/options";
+import moment from "moment";
 
 export default class PopupDetail extends PureComponent {
   constructor(props) {
@@ -222,12 +223,8 @@ export default class PopupDetail extends PureComponent {
   }
 
   render() {
-    const {
-      pageId,
-      controlList,
-      controlValues,
-      formState,
-    } = this.props.pageData;
+    const { pageId, controlList, controlValues, formState } =
+      this.props.pageData;
     const TIMESPENDHISTORYLIST = controlList.find(
       (ctrl) => ctrl.controlId === "TIMESPENDHISTORYLIST"
     );
@@ -269,10 +266,20 @@ export default class PopupDetail extends PureComponent {
                   <li key={`estimate_${index}`}>
                     <div>
                       {(timeInfo.writeDate ?? "").replace("T", " ")}
-                      {"\u00A0\u00A0Research Day : "}
-                      <span>{timeInfo.estimatePlanTimeInDay}</span>
-                      {"Work Day : "}
-                      <span>{timeInfo.estimateWorkTimeInDay}</span>
+                      {timeInfo.finDate ? (
+                        <>
+                          {"\u00A0\u00A0Estimate Day : "}
+                          <span>{moment(timeInfo.finDate).format("YYYY-MM-DD HH:mm")}</span>
+                        </>
+                      ) : (
+                        <>
+                          {"\u00A0\u00A0Research Day : "}
+                          <span>{timeInfo.estimatePlanTimeInDay}</span>
+                          {"Work Day : "}
+                          <span>{timeInfo.estimateWorkTimeInDay}</span>
+                        </>
+                      )}
+
                       {/* {`Research Day : ${timeInfo.estimatePlanTimeInDay} / Work Day : ${timeInfo.estimateWorkTimeInDay}`} */}
                     </div>
                     <div>{timeInfo.reason}</div>

@@ -49,6 +49,7 @@ fragment basicField on Job
     color
     name
   }
+  finDate
 }
 
 fragment timeData on Job
@@ -101,7 +102,8 @@ export function getKeyControlValuesByFetchedData(fecthedData) {
   return keyControlValues;
 }
 
-export function fetchDefaultCodeList() {  
+export function fetchDefaultCodeList() {
+  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const query = `
     query ECProject_Job{
       codeList {
@@ -131,7 +133,7 @@ export function fetchDefaultCodeList() {
     }
   `;
 
-  return fetchGraphQLData(query).then((result) => {
+  return fetchGraphQLData(url, query).then((result) => {
     const defaultCodeList = result.data.Data.data["codeList"];
     const labelList = (defaultCodeList.codeLabelList || []).map((item) => ({
       label: item.name,
@@ -167,6 +169,7 @@ export function fetchDefaultCodeList() {
 }
 
 export function fetchSiteCodeList() {
+  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const query = `
     query ECProject_Job ($inputData: UserGroupSearchOptionType!) {
       codeList {
@@ -195,9 +198,9 @@ export function fetchSiteCodeList() {
     },
   };
 
-  return fetchGraphQLData(query, variables).then((result) => {
+  return fetchGraphQLData(url, query, variables).then((result) => {
     const siteCodeList = result.data.Data.data["codeList"];
-    return (siteCodeList.codeUserGroupList || []).map((item) => ({
+    const siteList = (siteCodeList.codeUserGroupList || []).map((item) => ({
       label: item.siteName ?? "",
       value: item.site,
       baseBoard: { label: item.baseBoard.name, value: item.baseBoard.value },
@@ -208,10 +211,12 @@ export function fetchSiteCodeList() {
         label: item.baseCategory.name,
       },
     }));
+    return siteList;
   });
 }
 
 export function fetchUserCodeList() {
+  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const query = `
     query ECProject_Job ($inputData: UserSearchOptionType!) {
       codeList {
@@ -233,9 +238,9 @@ export function fetchUserCodeList() {
     },
   };
 
-  return fetchGraphQLData(query, variables).then((result) => {
+  return fetchGraphQLData(url, query, variables).then((result) => {
     const userCodeList = result.data.Data.data["codeList"];
-    return (userCodeList.codeUserList || []).map((item) => ({
+    const userList = (userCodeList.codeUserList || []).map((item) => ({
       label: item.name ?? "",
       value: item.id,
       relationControlData: {
@@ -245,6 +250,7 @@ export function fetchUserCodeList() {
         label: item.siteName,
       },
     }));
+    return userList;
   });
 }
 
@@ -269,6 +275,10 @@ export function fetchLoginData(params) {
           ...basicField
           ...timeData
         }
+        userAlarm {
+          targetId
+          targetTeam
+        }   
       }
     }
   `;
@@ -316,8 +326,9 @@ export function fetchLoginData(params) {
 
   const query = `${userQuery} ${fragments}`;
 
-  return fetchGraphQLData(query).then((result) => {
-    return result.data.Data.data["myUser"];
+  return fetchGraphQLData(null, query).then((result) => {
+    const userData = result.data.Data.data["myUser"];
+    return userData;
   });
 }
 
@@ -379,8 +390,9 @@ export function fetchCurrentlyDoingJob(params) {
 
   const query = `${userQuery} ${fragments}`;
 
-  return fetchGraphQLData(query).then((result) => {
-    return result.data.Data.data["myUser"];
+  return fetchGraphQLData(null, query).then((result) => {
+    const userData = result.data.Data.data["myUser"];
+    return userData;
   });
 }
 
@@ -399,46 +411,55 @@ export function fetchECAPIData(url, params) {
   });
 }
 
-export function fetchGraphQLData(query, variables) {
-  const defaultUrl = "/graphql";  
+export function getApiUrl(url) {
+  const defaultUrl = "/ECProject/API/SVC/Project/Common/CommonAPI";
+  const reqSid = window.location.href.match(/ec_req_sid=([^#]+)/)[0];
+  return `${url || defaultUrl}?${reqSid}`;
+}
+
+export function fetchGraphQLData(url, query, variables) {
+  const apiUrl = getApiUrl(url);
 
   return axios({
-    url: defaultUrl,
+    url: apiUrl,
     method: "post",
     data: {
       operationName: "ECProject_Job",
       query: query,
       variables: variables,
     },
-  }).then((data) => {
-    const errors = data?.data?.Data?.errors;
-    const messageList = [];
-    let messageResult;
-    let isError = false;
+  })
+    .then((data) => {
+      const errors = data?.data?.Data?.errors;
+      const messageList = [];
+      let messageResult;
+      let isError = false;
 
-    if (errors?.length > 0) {
-      errors.forEach((error) => {
-        const errCode = error.extensions.code;
-        const message = error.message ?? "";
+      if (errors?.length > 0) {
+        errors.forEach((error) => {
+          const errCode = error.extensions?.code;
+          const message = error.message ?? "";
 
-        if (errCode?.endsWith("Error")) {
-          isError = true;
+          if (errCode?.endsWith("Error")) {
+            isError = true;
+          }
+
+          messageList.push(message.replace("GraphQL.ExecutionError:", ""));
+        });
+
+        messageResult = messageList.join("\n");
+
+        if (isError) {
+          alert(`GraphQL.ExecutionError: ${messageResult}`);
+        } else {
+          alert("Notice: " + messageResult);
         }
-
-        messageList.push(message.replace("GraphQL.ExecutionError:", ""));
-      });
-
-      messageResult = messageList.join("\n");
-
-      if (isError) {
-        throw {
-          message: messageResult,
-        };
-      } else {
-        alert("Notice: " + messageResult);
       }
-    }
 
-    return data;
-  });
+      return data;
+    })
+    .catch(function () {
+      console.log(arguments);
+      alert("GraphQL.ExecutionError");
+    });
 }

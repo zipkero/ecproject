@@ -1,10 +1,10 @@
 import React, { PureComponent } from "react";
 import Form from "components/form/Form";
 import {
-  getParsedControlValuesByControlList,
   getDifferentControlValues,
+  getParsedControlValuesByControlList,
 } from "common";
-import { isArray, includes } from "lodash";
+import { includes, isArray } from "lodash";
 import { Button } from "@blueprintjs/core";
 
 export default class PopupCreateNewJob extends PureComponent {
@@ -21,7 +21,7 @@ export default class PopupCreateNewJob extends PureComponent {
       props.pageData.controlList.map((ctrl) => {
         switch (ctrl.controlId) {
           case "TEAM":
-            ctrl.useRelationControlData = false; // PIC ==> TEAM =X=> CATEGORY
+            ctrl.useRelationControlData = true; // PIC ==> TEAM =X=> CATEGORY
             break;
           case "PRIORITY2":
             ctrl.hide = false;
@@ -246,7 +246,7 @@ export default class PopupCreateNewJob extends PureComponent {
               icon={"cross"}
               className="btn btn-sm btn-default"
               onClick={this.handleClickClose.bind(this)}
-            ></Button>
+            />
           </div>
         </div>
         <div className="contents">

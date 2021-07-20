@@ -16,10 +16,14 @@ export default class PageDefault extends Component {
     if (props.pageData.usedGrid) {
       props.pageData.gridList = [
         props.pageData.gridListBox.find(
-          (item) => item.gridId === props.pageData.usedGrid
+          (item) => item.gridId == props.pageData.usedGrid
         ),
       ];
     }
+  }
+
+  componentDidMount() {
+    document.addEventListener("keyup", this.handleBodyKeyUp.bind(this));
   }
 
   componentWillUnmount() {
@@ -28,6 +32,8 @@ export default class PageDefault extends Component {
       this.props.pageData.gridList = [];
     }
     this.executeReset();
+
+    document.removeEventListener("keyup", this.handleBodyKeyUp.bind(this));
   }
 
   componentDidUpdate(prevProps) {
@@ -45,7 +51,7 @@ export default class PageDefault extends Component {
         this.props.pageData.usedGrid = REPORTTYPE ?? this.state.usedGrid; // search reset 에 의해 REPORTTYPE 값이 undefined 로 들어올 수 있다.
         this.props.pageData.gridList = [
           this.props.pageData.gridListBox.find(
-            (item) => item.gridId === this.props.pageData.usedGrid
+            (item) => item.gridId == this.props.pageData.usedGrid
           ),
         ];
         this.props.containerActions.triggerFetchJobList();
@@ -73,6 +79,21 @@ export default class PageDefault extends Component {
     this.executeReset();
   }
 
+  handleBodyKeyUp(e) {
+    if (e.keyCode === 113) {
+      if (
+        !Object.keys(this.props.pages).some((key) => {
+          return (
+            this.props.pages[key].isPopup === true &&
+            this.props.pages[key].isOpen === true
+          );
+        })
+      ) {
+        this.executeSearch();
+      }
+    }
+  }
+
   executeReset() {
     this.props.containerActions.resetPageState({
       pageId: this.props.pageData.pageId,
@@ -87,12 +108,8 @@ export default class PageDefault extends Component {
   }
 
   render() {
-    const {
-      pageData,
-      containerActions,
-      useSearchBtn,
-      useResetBtn,
-    } = this.props;
+    const { pageData, containerActions, useSearchBtn, useResetBtn } =
+      this.props;
     const { pageId, gridList, controlList, formState, tracks } = pageData;
     const formId = pageId + "_form";
     const formComponent =
@@ -121,6 +138,7 @@ export default class PageDefault extends Component {
             searchControlList={searchControlList}
             containerActions={containerActions}
             pageId={pageId}
+            options={pageData.options}
           />
         </div>
       );

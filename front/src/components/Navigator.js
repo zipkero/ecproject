@@ -1,189 +1,166 @@
-import React from "react";
+import React, { Component } from "react";
 import { Classes, Tree } from "@blueprintjs/core";
-import { actions } from "store/actionTypes";
-import { useDispatch } from "react-redux";
 
-const Navigator = () => {
-  const dispatch = useDispatch();
-  const userData = window.SCHEDULER_GLOBAL_DATA?.userData;
-  const [nodes, setNodes] = useState([
-    {
-      id: "MyMenu",
-      menuId: "MyJob",
-      isExpanded: true,
-      label: "My Menu",
-      childNodes: [
+export default class Navigator extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      nodes: [
         {
-          id: "MyJob",
+          id: "MyMenu",
           menuId: "MyJob",
-          label: "My Job",
-          isSelected: true,
+          isExpanded: true,
+          label: "My Menu",
+          childNodes: [
+            {
+              id: "MyJob",
+              menuId: "MyJob",
+              label: "My Job",
+              isSelected: true,
+            },
+            {
+              id: "MyTeam",
+              menuId: "MyTeam",
+              label: "My Team",
+            },
+            {
+              id: "MyPost",
+              menuId: "MyPost",
+              label: "My Post",
+            },
+          ],
         },
         {
-          id: "MyTeam",
-          menuId: "MyTeam",
-          label: "My Team",
-        },
-        {
-          id: "MyPost",
-          menuId: "MyPost",
-          label: "My Post",
-        },
-      ],
-    },
-    {
-      id: "AllMenu",
-      menuId: "ByTeam",
-      label: "All Menu",
-      isExpanded: true,
-      childNodes: [
-        {
-          id: "ByTeam",
+          id: "AllMenu",
           menuId: "ByTeam",
-          label: "By Team",
+          label: "All Menu",
+          isExpanded: true,
+          childNodes: [
+            {
+              id: "ByTeam",
+              menuId: "ByTeam",
+              label: "By Team",
+            },
+            {
+              id: "ByJob",
+              menuId: "ByJob",
+              label: "By Job",
+            },
+            {
+              id: "ProgressedInTest",
+              menuId: "ProgressedInTest",
+              label: "Progressed In Test",
+            },
+            {
+              id: "UnAllocatedSupportTest",
+              menuId: "UnAllocatedSupportTest",
+              label: "Unalloacted Support/Test",
+            },
+            {
+              id: "UnAllocatedDev",
+              menuId: "UnAllocatedDev",
+              label: "UnAllocated Dev",
+            },
+            {
+              id: "UnAllocatedPlan",
+              menuId: "UnAllocatedPlan",
+              label: "UnAllocated Plan",
+            },
+            {
+              id: "All",
+              menuId: "AllJob",
+              label: "All Job",
+            },
+            {
+              id: "ETCCategory",
+              menuId: "ETCCategory",
+              label: "ETC Category",
+            },
+            {
+              id: "Report",
+              menuId: "Report",
+              label: "Report",
+            },
+            {
+              id: "Gantt",
+              menuId: "Gantt",
+              label: "Gantt",
+            },
+          ],
         },
         {
-          id: "ByJob",
-          menuId: "ByJob",
-          label: "By Job",
-        },
-        {
-          id: "ProgressedInTest",
-          menuId: "ProgressedInTest",
-          label: "Progressed In Test",
-        },
-        {
-          id: "UnAllocatedSupportTest",
-          menuId: "UnAllocatedSupportTest",
-          label: "Unalloacted Support/Test",
-        },
-        {
-          id: "UnAllocatedDev",
-          menuId: "UnAllocatedDev",
-          label: "UnAllocated Dev",
-        },
-        {
-          id: "UnAllocatedPlan",
-          menuId: "UnAllocatedPlan",
-          label: "UnAllocated Plan",
-        },
-        {
-          id: "All",
-          menuId: "AllJob",
-          label: "All Job",
-        },
-        {
-          id: "ETCCategory",
-          menuId: "ETCCategory",
-          label: "ETC Category",
-        },
-        {
-          id: "Report",
-          menuId: "Report",
-          label: "Report",
-        },
-        {
-          id: "Gantt",
-          menuId: "Gantt",
-          label: "Gantt",
-        },
-      ],
-    },
-    {
-      id: "AllMenuMgmt",
-      menuId: "ByTeamForMgmt",
-      isExpanded: true,
-      label: "All Menu (Mgmt.)",
-      childNodes: [
-        {
-          id: "ByTeamForMgmt",
+          id: "AllMenuMgmt",
           menuId: "ByTeamForMgmt",
-          label: "By Team",
-        },
-        {
-          id: "UnAllocatedJobForMgmt",
-          menuId: "UnAllocatedJobForMgmt",
-          label: "UnAllocated Job",
+          isExpanded: true,
+          label: "All Menu (Mgmt.)",
+          childNodes: [
+            {
+              id: "ByTeamForMgmt",
+              menuId: "ByTeamForMgmt",
+              label: "By Team",
+            },
+            {
+              id: "UnAllocatedJobForMgmt",
+              menuId: "UnAllocatedJobForMgmt",
+              label: "UnAllocated Job",
+            },
+          ],
         },
       ],
-    },
-  ]);
+    };
+  }
 
-  const userDataComponent = userData ? (
-    <div className="header-user">
-      <span>{userData.siteName ?? ""}</span>
-      {userData.name ?? ""}
-    </div>
-  ) : (
-    <></>
-  );
+  handleNodeClick(nodeData, _nodePath, e) {
+    if (!e.shiftKey) {
+      this.forEachNode(this.state.nodes, (n) => (n.isSelected = false));
+    }
+    nodeData.isSelected = true;
+    this.setState(this.state);
+    this.props.containerActions.updateNavigatorActiveMenu(nodeData.menuId);
+  }
 
-  const handleNodeClick = (nodeData, _nodePath, e) => {
-    setNodes((prev) => {
-      return forEachNode(prev, (node) => {
-        if (node.id === nodeData.id) {
-          node.isSelected = true;
-        } else {
-          if (!e.shiftKey) {
-            node.isSelected = false;
-          }
-        }
-      });
-    });
-    
-    dispatch(actions.updateNavigatorActiveMenu(nodeData.menuId));
-  };
+  handleNodeCollapse(nodeData) {
+    nodeData.isExpanded = false;
+    this.setState(this.state);
+  }
 
-  const handleNodeCollapse = (nodeData) => {
-    setNodes((prev) => {
-      return forEachNode(prev, (node) => {
-        if (node.id === nodeData.id) {
-          node.isExpanded = false;
-        }
-      });
-    });
-  };
+  handleNodeExpand(nodeData) {
+    nodeData.isExpanded = true;
+    this.setState(this.state);
+  }
 
-  const handleNodeExpand = (nodeData) => {
-    setNodes((prev) => {
-      return forEachNode(prev, (node) => {
-        if (node.id === nodeData.id) {
-          node.isExpanded = true;
-        }
-      });
-    });
-  };
-
-  const forEachNode = (nodes, callback) => {
+  forEachNode(nodes, callback) {
     if (nodes == null) {
       return;
     }
 
-    return nodes.map((node) => {
+    for (const node of nodes) {
       callback(node);
-      if (node.childNodes) {
-        node.childNodes = {
-          ...forEachNode(node.childNodes, callback),
-        };
-      }
-      return {
-        ...node,
-      };
-    });
-  };
+      this.forEachNode(node.childNodes, callback);
+    }
+  }
 
-  return (
-    <div className="navigator-template">
-      {userDataComponent}
-      <Tree
-        contents={nodes}
-        onNodeClick={handleNodeClick}
-        onNodeCollapse={handleNodeCollapse}
-        onNodeExpand={handleNodeExpand}
-        className={Classes.ELEVATION_0}
-      />
-    </div>
-  );
-};
-
-export default Navigator;
+  render() {
+    const userData = window.SCHEDULER_GLOBAL_DATA?.userData;
+    const userDataComponent = userData ? (
+      <div className="header-user">
+        <span>{userData.siteName ?? ""}</span>
+        {userData.name ?? ""}
+      </div>
+    ) : (
+      <></>
+    );
+    return (
+      <div className="navigator-template">
+        {userDataComponent}
+        <Tree
+          contents={this.state.nodes}
+          onNodeClick={this.handleNodeClick.bind(this)}
+          onNodeCollapse={this.handleNodeCollapse.bind(this)}
+          onNodeExpand={this.handleNodeExpand.bind(this)}
+          className={Classes.ELEVATION_0}
+        />
+      </div>
+    );
+  }
+}

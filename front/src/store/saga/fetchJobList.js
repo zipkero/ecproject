@@ -1,4 +1,4 @@
-import { stateSelector } from "store/saga/common";
+import { stateSelector } from "store/saga/common.js";
 import { actions } from "store/actionTypes";
 import { put, select } from "redux-saga/effects";
 import { getParsedControlValuesByControlList } from "common";
@@ -12,16 +12,23 @@ export default function* fetchJobList(action) {
     pageState.controlList
   );
   const maxPageNum = pageState.gridList?.[0]?.stepperOptions?.maxPageNum;
-  let { activePageNum = 1, requestDataNum, dontNeedAllAmount } =
-    action?.payload ?? pageState.gridList?.[0]?.stepperOptions ?? {};
+  let {
+    activePageNum = 1,
+    requestDataNum,
+    dontNeedAllAmount,
+  } = action?.payload ?? pageState.gridList?.[0]?.stepperOptions ?? {};
   const {
     isShowOthers = false,
     isShowAllStatus = false,
+    isProgressedInTestFilterApply = false,
   } = pageState?.options || {
     isShowOthers: false,
     isShowAllStatus: false,
+    isProgressedInTestFilterApply: false,
   };
 
+  console.log(pageState?.options);
+  console.log(isProgressedInTestFilterApply)
   try {
     yield put(actions.toggleProgressOverlay(true));
 
@@ -33,7 +40,8 @@ export default function* fetchJobList(action) {
       dontNeedAllAmount,
       pageState,
       isShowOthers,
-      isShowAllStatus
+      isShowAllStatus,
+      isProgressedInTestFilterApply
     );
 
     const pageData = {
@@ -50,7 +58,7 @@ export default function* fetchJobList(action) {
       yield put(actions.updatePageGridData(pageData));
     }
   } catch (e) {
-    console.log(e.message);
+    console.log(e);
   } finally {
     yield put(actions.toggleProgressOverlay(false));
   }

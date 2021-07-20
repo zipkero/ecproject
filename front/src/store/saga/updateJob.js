@@ -1,4 +1,4 @@
-import { fetchGraphQLData } from "store/saga/common";
+import { fetchGraphQLData } from "store/saga/common.js";
 import { actions } from "store/actionTypes";
 import { put } from "redux-saga/effects";
 
@@ -149,7 +149,7 @@ export default function* updateJob(action) {
 
     yield put(actions.toggleProgressOverlay(true));
 
-    const data = yield fetchGraphQLData(query, variables);
+    const data = yield fetchGraphQLData(null, query, variables);
 
     if (toIngRowData) {
       toIngRowData.STATUS.value = 30;

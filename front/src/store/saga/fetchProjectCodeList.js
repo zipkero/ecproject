@@ -1,9 +1,10 @@
-import { fetchGraphQLData } from "store/saga/common";
+import { fetchGraphQLData } from "store/saga/common.js";
 import { actions } from "store/actionTypes";
 import { put } from "redux-saga/effects";
 
 export default function* fetchProjectCodeList(action) {
   const { pageId, controlId, param = "" } = action.payload;
+  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const query = `
     query ECProject_Job ($inputData: ProjectCodeSearchOptionType!) {
       codeList {
@@ -30,9 +31,12 @@ export default function* fetchProjectCodeList(action) {
   try {
     yield put(actions.toggleProgressOverlay(true));
 
-    const result = yield fetchGraphQLData(query, variables);
+    const result = yield fetchGraphQLData(url, query, variables);
     const newItems = result.data.Data.data.codeList.codeProjectCodeList.map(
-      (item) => ({ value: item.code, label: item.name ?? "" })
+      (item) => ({
+        value: item.code,
+        label: item.name ?? "",
+      })
     );
     const hasNoItems = newItems.length === 0;
     const newControlData = {

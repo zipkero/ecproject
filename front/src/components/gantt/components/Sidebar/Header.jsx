@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import CustomElement from "./CustomElement";
 import PropTypes from "prop-types";
 

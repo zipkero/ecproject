@@ -3,14 +3,13 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import BasicElement from "../../Elements/Basic";
-import { getDayMonth } from "../../../utils/formatDate";
 
 const Element = (props) => {
   const { time, popupData, handlePopup, start, end } = props;
 
   const elementStyle = {
     ...time.toStyleLeftAndWidth(start, end),
-    ...(handlePopup ? { cursor: "pointer" } : {}),
+    ...(handlePopup ? { cursor: "pointer" } : {})
   };
 
   return (
@@ -26,7 +25,7 @@ const Element = (props) => {
 
 Element.propTypes = {
   time: PropTypes.shape({
-    toStyleLeftAndWidth: PropTypes.func,
+    toStyleLeftAndWidth: PropTypes.func
   }).isRequired,
   style: PropTypes.shape({}),
   classes: PropTypes.shape({}),
@@ -34,7 +33,7 @@ Element.propTypes = {
   title: PropTypes.string,
   start: PropTypes.instanceOf(Date).isRequired,
   end: PropTypes.instanceOf(Date).isRequired,
-  tooltip: PropTypes.string,
+  tooltip: PropTypes.string
 };
 
 export default Element;

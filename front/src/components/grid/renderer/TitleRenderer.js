@@ -4,15 +4,8 @@ const TitleRenderer = (props) => {
   const formRef = useRef(null);
 
   const { data: rowData, value: title } = props;
-  const {
-    BOARDCD,
-    BOARDSEQ,
-    BOARDNUM,
-    JOBCODE,
-    CATEGORY,
-    PIC,
-    WRITEDATE,
-  } = rowData;
+  const { BOARDCD, BOARDSEQ, BOARDNUM, JOBCODE, CATEGORY, PIC, WRITEDATE } =
+    rowData;
 
   const query = `
     mutation ECProject_Job($inputData:JobUpdate!, $jobKey:JobDataKey! $history: JobTimeSpendHistoryInput) {

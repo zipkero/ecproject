@@ -3,9 +3,7 @@
 @import "~ag-grid-community/src/styles/ag-theme-balham/sass/ag-theme-balham-mixin.scss";
 
 .ag-theme-custom {
-  @include ag-theme-balham(
-    (
-      odd-row-background-color: null,
-    )
-  );
+  @include ag-theme-balham((
+          odd-row-background-color: null,
+  ));
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Popover } from "@blueprintjs/core";
-import useFetch from "hooks/useFetch";
+import useFetch from "../../../hooks/useFetch";
 import fetchReviewHistory from "../../../store/saga/fetchReviewHistory";
 import { getParsedDate } from "../../../common";
 

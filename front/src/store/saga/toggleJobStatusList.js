@@ -1,4 +1,4 @@
-import { fetchGraphQLData } from "store/saga/common";
+import { fetchGraphQLData } from "store/saga/common.js";
 import { actions } from "store/actionTypes";
 import { put } from "redux-saga/effects";
 
@@ -45,7 +45,7 @@ export default function* toggleJobStatusList(action) {
           writeDate: WRITEDATE,
         },
       };
-      saveResult.push(yield fetchGraphQLData(query, variables));
+      saveResult.push(yield fetchGraphQLData(null, query, variables));
     }
 
     yield put(

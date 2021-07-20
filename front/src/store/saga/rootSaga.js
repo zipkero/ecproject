@@ -1,4 +1,4 @@
-import { take, takeEvery, takeLatest } from "redux-saga/effects";
+import { takeLatest } from "redux-saga/effects";
 import { types } from "store/actionTypes";
 
 import toggleJobStatus from "store/saga/toggleJobStatus";
@@ -14,6 +14,7 @@ import assignPIC from "store/saga/assignPIC";
 import fetchJobList from "store/saga/fetchJobList";
 import fetchLoginData from "store/saga/fetchLoginData";
 import fetchProjectCodeList from "store/saga/fetchProjectCodeList";
+import updateUserAlarm from "store/saga/updateUserAlarm";
 
 export function* schedulerSaga() {
   yield takeLatest(types.TRIGGER_TOGGLE_JOB_STATUS, toggleJobStatus);
@@ -29,6 +30,7 @@ export function* schedulerSaga() {
   yield takeLatest(types.TRIGGER_FETCH_LOGIN_DATA, fetchLoginData);
   yield takeLatest(types.TRIGGER_FETCH_JOB_LIST, fetchJobList);
   yield takeLatest(types.TRIGGER_FETCH_PROJECT_CODE_LIST, fetchProjectCodeList);
+  yield takeLatest(types.UPDATE_ALARM_DATA, updateUserAlarm);
 
   //yield takeEvery(types.TEST, codeFetchTest);
 }

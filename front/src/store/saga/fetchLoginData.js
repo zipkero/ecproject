@@ -1,8 +1,9 @@
-import { fetchGraphQLData } from "store/saga/common";
+import { fetchGraphQLData } from "store/saga/common.js";
 import { actions } from "store/actionTypes";
 import { put } from "redux-saga/effects";
 
 export default function* fetchLoginData(action) {
+  const url = "/ECProject/API/SVC/Project/Common/CommonAPI";
   const userQuery = `
     query ECProject_Job {
       myUser {
@@ -72,6 +73,7 @@ export default function* fetchLoginData(action) {
       timeSpendEstimateList {
         estimatePlanTimeInDay
         estimateWorkTimeInDay
+        finDate
       }
     }
   `;
@@ -81,7 +83,7 @@ export default function* fetchLoginData(action) {
   try {
     yield put(actions.toggleProgressOverlay(true));
 
-    const userDataResult = yield fetchGraphQLData(query);
+    const userDataResult = yield fetchGraphQLData(url, query);
     const userData = userDataResult.data.Data.data["myUser"];
 
     yield put(actions.updateLoginData(userData));

@@ -21,17 +21,14 @@ export default function PopupGanttDetail(props) {
     "JOBCODE",
   ];
 
-  const {
-    TIMESPENDHISTORYLIST,
-    TIMESPENDESTIMATELIST,
-    JOBCODE,
-  } = pageData.controlList.reduce((acc, control) => {
-    if (neededControlId.includes(control.controlId)) {
-      acc[control.controlId] = control;
+  const { TIMESPENDHISTORYLIST, TIMESPENDESTIMATELIST, JOBCODE } =
+    pageData.controlList.reduce((acc, control) => {
+      if (neededControlId.includes(control.controlId)) {
+        acc[control.controlId] = control;
+        return acc;
+      }
       return acc;
-    }
-    return acc;
-  }, {});
+    }, {});
 
   const handleClickClose = useCallback(() => {
     containerActions.updatePopupToggle({

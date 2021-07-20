@@ -15,8 +15,7 @@ import PopupChangeStatus from "pages/popup/PopupChangeStatus";
 import PopupDetail from "pages/popup/PopupDetail";
 import PopupGanttDetail from "pages/popup/PopupGanttDetail";
 import PopupNotice from "pages/popup/PopupNotice";
-
-import Test from "components/Test";
+import PopupAlarmManage from "pages/popup/PopupAlarmManage";
 
 const POPUP_COMPONENT_TYPE = {
   PopupCodeSearch: PopupCodeSearch,
@@ -28,6 +27,7 @@ const POPUP_COMPONENT_TYPE = {
   PopupDetail: PopupDetail,
   PopupGanttDetail: PopupGanttDetail,
   PopupNotice: PopupNotice,
+  PopupAlarmManage: PopupAlarmManage,
 };
 
 class Container extends Component {

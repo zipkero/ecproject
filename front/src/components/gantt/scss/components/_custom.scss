@@ -67,8 +67,7 @@
 }
 
 .rt-custom-layout {
-  margin-left: -($react-timelines-sidebar-width -
-        $react-timelines-sidebar-closed-offset);
+  margin-left: -($react-timelines-sidebar-width - $react-timelines-sidebar-closed-offset);
   height: 100%;
   overflow-y: scroll;
 

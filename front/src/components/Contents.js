@@ -76,7 +76,7 @@ export default class Contents extends Component {
       }
     `;
 
-    fetchGraphQLData(query)
+    fetchGraphQLData(null, query)
       .then((result) => {
         const isSucess = result.data.Data.data.manage.erpSync;
         alert(isSucess ? "success!" : "fail. check if you are a master or not");
@@ -95,16 +95,24 @@ export default class Contents extends Component {
         }
       }
     `;
-    fetchGraphQLData(query)
+    fetchGraphQLData(null, query)
       .then((result) => {
         const isSucess = result.data.Data.data.manage.erpAlert;
-
         alert(isSucess ? "success!" : "fail!");
       })
       .catch((error) => {
         console.log(error);
         alert("fail with error");
       });
+  }
+
+  handleAlarmManagePopup() {
+    this.togglePopup(this.props.pages.PopupAlarmManage.pageId, true);
+
+    /*this.props.containerActions.updateAlarmData({
+      userId: "문영",
+      alarmList: [{ targetId: "철수", targetTeam: "고등어" }],
+    });*/
   }
 
   togglePopup(pageId, isOpen, controlValues, volatileValues) {
@@ -242,11 +250,19 @@ export default class Contents extends Component {
             Info
           </Button>
           <Button
+            icon="send-message"
+            className="bp3-small"
+            indent={Intent.PRIMARY}
+            onClick={this.handleAlarmManagePopup.bind(this)}
+          >
+            Alarm Manage
+          </Button>
+          <Button
             icon={"notifications"}
             className="bp3-small"
             intent={Intent.SUCCESS}
             onClick={this.handleNotification.bind(this)}
-          ></Button>
+          />
           {this.isMaster(userData) ? (
             <Button
               icon="refresh"
@@ -301,6 +317,7 @@ export default class Contents extends Component {
         <PageComponent
           containerActions={this.props.containerActions}
           pageData={pages[activeMenuId]}
+          pages={this.props.pages}
         />
       </div>
     );

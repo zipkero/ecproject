@@ -113,7 +113,7 @@ export default class SelectEditor extends PureComponent {
           values={value}
           items={items}
           handleDataChange={this.handleChange.bind(this)}
-          setFocusInput={this.state.setFocusInput}
+          focusInput={this.state.setFocusInput}
         />
       </div>
     );

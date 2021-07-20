@@ -7,7 +7,9 @@ import { addListener, removeListener } from "../../utils/events";
 import raf from "../../utils/raf";
 import getNumericPropertyValue from "../../utils/getNumericPropertyValue";
 import { BottomScroll } from "../../builders";
+
 const bottomScroll = new BottomScroll();
+
 class Layout extends PureComponent {
   constructor(props) {
     super(props);
@@ -172,12 +174,8 @@ class Layout extends PureComponent {
       handlePopup,
     } = this.props;
 
-    const {
-      isSticky,
-      headerHeight,
-      timelineTopPosition,
-      scrollLeft,
-    } = this.state;
+    const { isSticky, headerHeight, timelineTopPosition, scrollLeft } =
+      this.state;
     return (
       <div
         className={`rt-custom-layout ${isOpen ? "rt-is-open" : ""}`}

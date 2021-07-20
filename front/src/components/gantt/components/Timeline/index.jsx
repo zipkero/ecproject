@@ -1,11 +1,8 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 import Header from "./Header";
 import Body from "./Body";
-import NowMarker from "./Marker/Now";
-import PointerMarker from "./Marker/Pointer";
-import getMouseX from "../../utils/getMouseX";
 import getGrid from "../../utils/getGrid";
 
 function Timeline({ now, time, timebar, tracks, sticky, handlePopup }) {
